@@ -1,2 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" />
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Internal">
+      <UniqueIdentifier>{524361f0-2b87-4080-af0f-2d8a9dee981a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{c5157533-2b5a-4aea-85df-60d41372194e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\Frames">
+      <UniqueIdentifier>{213a7847-bf0b-411a-b488-a40b296fda0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\Frames">
+      <UniqueIdentifier>{60330a34-fc2c-4631-8126-e90475c29b75}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Frames\Frames.cpp">
+      <Filter>Internal\Frames</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\JBFrameworkInclude\Frames\Frames.h">
+      <Filter>External\Frames</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
