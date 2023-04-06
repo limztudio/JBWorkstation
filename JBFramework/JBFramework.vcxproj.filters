@@ -13,15 +13,122 @@
     <Filter Include="External\Frames">
       <UniqueIdentifier>{60330a34-fc2c-4631-8126-e90475c29b75}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\DirectXMath">
+      <UniqueIdentifier>{7ea239ca-f0a2-4499-ae57-8cc69eee0f58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\DirectXMath">
+      <UniqueIdentifier>{0c8e083e-b5e5-431e-87e4-aec5580328dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\DirectXMath\SHMath">
+      <UniqueIdentifier>{4a8ed768-ee43-4c92-9200-03d779389911}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\DirectXMath\SHMath">
+      <UniqueIdentifier>{4392bc25-b3c7-48b1-aa0a-dde52c71f737}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\DirectXMath\Stereo3D">
+      <UniqueIdentifier>{ec39eaff-ff33-4808-a54e-1548ccc4f3cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\DirectXMath\Stereo3D">
+      <UniqueIdentifier>{6a41a6f9-b99a-43b9-972e-2634062f4407}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\DirectXMath\Extensions">
+      <UniqueIdentifier>{b4ab43e7-3ae9-456d-b545-dd5d3dd55a26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\DirectXMath\Inc">
+      <UniqueIdentifier>{a66c7aa1-d833-449d-976f-f6db087a867a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\DirectXMath\MatrixStack">
+      <UniqueIdentifier>{c48bd091-956f-43dc-9355-e1b004e843bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\DirectXMath\XDSP">
+      <UniqueIdentifier>{a0bb0840-00b7-4dde-8ec5-1aad41569f09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Frames\Frames.cpp">
       <Filter>Internal\Frames</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectXMath\SHMath\DirectXSH.cpp">
+      <Filter>Internal\DirectXMath\SHMath</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectXMath\SHMath\DirectXSHD3D12.cpp">
+      <Filter>Internal\DirectXMath\SHMath</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectXMath\Stereo3D\Stereo3DMatrixHelper.cpp">
+      <Filter>Internal\DirectXMath\Stereo3D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\JBFrameworkInclude\Frames\Frames.h">
       <Filter>External\Frames</Filter>
     </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathAVX.h">
+      <Filter>External\DirectXMath\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathAVX2.h">
+      <Filter>External\DirectXMath\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathBE.h">
+      <Filter>External\DirectXMath\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathF16C.h">
+      <Filter>External\DirectXMath\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathFMA3.h">
+      <Filter>External\DirectXMath\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathFMA4.h">
+      <Filter>External\DirectXMath\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathSSE3.h">
+      <Filter>External\DirectXMath\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathSSE4.h">
+      <Filter>External\DirectXMath\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXColors.h">
+      <Filter>External\DirectXMath\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXMath.h">
+      <Filter>External\DirectXMath\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXPackedVector.h">
+      <Filter>External\DirectXMath\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXCollision.h">
+      <Filter>External\DirectXMath\Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\MatrixStack\DirectXMatrixStack.h">
+      <Filter>External\DirectXMath\MatrixStack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\SHMath\DirectXSH.h">
+      <Filter>External\DirectXMath\SHMath</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Stereo3D\Stereo3DMatrixHelper.h">
+      <Filter>External\DirectXMath\Stereo3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\XDSP\XDSP.h">
+      <Filter>External\DirectXMath\XDSP</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXMathConvert.inl">
+      <Filter>External\DirectXMath\Inc</Filter>
+    </None>
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXMathMatrix.inl">
+      <Filter>External\DirectXMath\Inc</Filter>
+    </None>
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXMathMisc.inl">
+      <Filter>External\DirectXMath\Inc</Filter>
+    </None>
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXMathVector.inl">
+      <Filter>External\DirectXMath\Inc</Filter>
+    </None>
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXPackedVector.inl">
+      <Filter>External\DirectXMath\Inc</Filter>
+    </None>
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXCollision.inl">
+      <Filter>External\DirectXMath\Inc</Filter>
+    </None>
   </ItemGroup>
 </Project>

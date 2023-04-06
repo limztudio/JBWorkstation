@@ -95,10 +95,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DirectXMath\SHMath\DirectXSH.cpp" />
+    <ClCompile Include="DirectXMath\SHMath\DirectXSHD3D12.cpp" />
+    <ClCompile Include="DirectXMath\Stereo3D\Stereo3DMatrixHelper.cpp" />
     <ClCompile Include="Frames\Frames.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathAVX.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathAVX2.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathBE.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathF16C.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathFMA3.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathFMA4.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathSSE3.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Extensions\DirectXMathSSE4.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXCollision.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXColors.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXMath.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXPackedVector.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\MatrixStack\DirectXMatrixStack.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\SHMath\DirectXSH.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Stereo3D\Stereo3DMatrixHelper.h" />
+    <ClInclude Include="..\JBFrameworkInclude\DirectXMath\XDSP\XDSP.h" />
     <ClInclude Include="..\JBFrameworkInclude\Frames\Frames.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXCollision.inl" />
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXMathConvert.inl" />
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXMathMatrix.inl" />
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXMathMisc.inl" />
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXMathVector.inl" />
+    <None Include="..\JBFrameworkInclude\DirectXMath\Inc\DirectXPackedVector.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
