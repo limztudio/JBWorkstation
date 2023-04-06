@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33423.256
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JBFramework", "JBFramework\JBFramework.vcxproj", "{46FE8EB6-B438-46CD-8DA2-F649E80F138E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicGround", "BasicGround\BasicGround.vcxproj", "{759D2D4B-B93B-42FB-801F-A2F0C72288F8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{46FE8EB6-B438-46CD-8DA2-F649E80F138E}.Debug|x64.ActiveCfg = Debug|x64
+		{46FE8EB6-B438-46CD-8DA2-F649E80F138E}.Debug|x64.Build.0 = Debug|x64
+		{46FE8EB6-B438-46CD-8DA2-F649E80F138E}.Release|x64.ActiveCfg = Release|x64
+		{46FE8EB6-B438-46CD-8DA2-F649E80F138E}.Release|x64.Build.0 = Release|x64
+		{759D2D4B-B93B-42FB-801F-A2F0C72288F8}.Debug|x64.ActiveCfg = Debug|x64
+		{759D2D4B-B93B-42FB-801F-A2F0C72288F8}.Debug|x64.Build.0 = Debug|x64
+		{759D2D4B-B93B-42FB-801F-A2F0C72288F8}.Release|x64.ActiveCfg = Release|x64
+		{759D2D4B-B93B-42FB-801F-A2F0C72288F8}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7B02E034-F308-4AFB-B304-385671A6CF40}
+	EndGlobalSection
+EndGlobal
