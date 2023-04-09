@@ -98,6 +98,7 @@
     <ClCompile Include="DirectXMath\SHMath\DirectXSH.cpp" />
     <ClCompile Include="DirectXMath\SHMath\DirectXSHD3D12.cpp" />
     <ClCompile Include="DirectXMath\Stereo3D\Stereo3DMatrixHelper.cpp" />
+    <ClCompile Include="Error\Error.cpp" />
     <ClCompile Include="Frames\Frames.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +118,7 @@
     <ClInclude Include="..\JBFrameworkInclude\DirectXMath\SHMath\DirectXSH.h" />
     <ClInclude Include="..\JBFrameworkInclude\DirectXMath\Stereo3D\Stereo3DMatrixHelper.h" />
     <ClInclude Include="..\JBFrameworkInclude\DirectXMath\XDSP\XDSP.h" />
+    <ClInclude Include="..\JBFrameworkInclude\Error\Error.h" />
     <ClInclude Include="..\JBFrameworkInclude\Frames\Frames.h" />
   </ItemGroup>
   <ItemGroup>

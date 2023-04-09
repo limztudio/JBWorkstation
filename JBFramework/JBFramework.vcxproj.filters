@@ -43,6 +43,12 @@
     <Filter Include="External\DirectXMath\XDSP">
       <UniqueIdentifier>{a0bb0840-00b7-4dde-8ec5-1aad41569f09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\Error">
+      <UniqueIdentifier>{f2cecdf0-ece2-4b70-9788-0d141470d9e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\Error">
+      <UniqueIdentifier>{049f2279-7a22-456d-8186-2af78f108fcc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Frames\Frames.cpp">
@@ -56,6 +62,9 @@
     </ClCompile>
     <ClCompile Include="DirectXMath\Stereo3D\Stereo3DMatrixHelper.cpp">
       <Filter>Internal\DirectXMath\Stereo3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Error\Error.cpp">
+      <Filter>Internal\Error</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="..\JBFrameworkInclude\DirectXMath\XDSP\XDSP.h">
       <Filter>External\DirectXMath\XDSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\Error\Error.h">
+      <Filter>External\Error</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

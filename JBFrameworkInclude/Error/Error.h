@@ -1,17 +1,26 @@
-#include <Frames/Frames.h>
+#ifndef _ERROR_H_
+#define _ERROR_H_
+
+
+#include <tchar.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow){
-    JBF::WindowFrame Frame;
+namespace JBF{
+    enum class ErrorCode : unsigned long{
+        SUCCEEDED,
 
-    
-    
-    return 0;
-}
+        
+    };
+
+    bool GetErrorMessage();
+};
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#endif _ERROR_H_
 
