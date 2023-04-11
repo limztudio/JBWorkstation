@@ -61,7 +61,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)JBFrameworkInclude\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)JBFrameworkInclude\;.\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -78,7 +78,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)JBFrameworkInclude\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)JBFrameworkInclude\;.\</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -98,6 +98,16 @@
     <ClCompile Include="DirectXMath\SHMath\DirectXSH.cpp" />
     <ClCompile Include="DirectXMath\SHMath\DirectXSHD3D12.cpp" />
     <ClCompile Include="DirectXMath\Stereo3D\Stereo3DMatrixHelper.cpp" />
+    <ClCompile Include="EASTL\source\allocator_eastl.cpp" />
+    <ClCompile Include="EASTL\source\assert.cpp" />
+    <ClCompile Include="EASTL\source\atomic.cpp" />
+    <ClCompile Include="EASTL\source\fixed_pool.cpp" />
+    <ClCompile Include="EASTL\source\hashtable.cpp" />
+    <ClCompile Include="EASTL\source\intrusive_list.cpp" />
+    <ClCompile Include="EASTL\source\numeric_limits.cpp" />
+    <ClCompile Include="EASTL\source\red_black_tree.cpp" />
+    <ClCompile Include="EASTL\source\string.cpp" />
+    <ClCompile Include="EASTL\source\thread_support.cpp" />
     <ClCompile Include="Error\Error.cpp" />
     <ClCompile Include="Frames\Frames.cpp" />
   </ItemGroup>

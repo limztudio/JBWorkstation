@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JBFramework", "JBFramework\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BasicGround", "BasicGround\BasicGround.vcxproj", "{759D2D4B-B93B-42FB-801F-A2F0C72288F8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JBLogger", "JBLogger\JBLogger.vcxproj", "{EAE82A56-4F32-4088-9560-BC718ACF34F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,10 @@ Global
 		{759D2D4B-B93B-42FB-801F-A2F0C72288F8}.Debug|x64.Build.0 = Debug|x64
 		{759D2D4B-B93B-42FB-801F-A2F0C72288F8}.Release|x64.ActiveCfg = Release|x64
 		{759D2D4B-B93B-42FB-801F-A2F0C72288F8}.Release|x64.Build.0 = Release|x64
+		{EAE82A56-4F32-4088-9560-BC718ACF34F1}.Debug|x64.ActiveCfg = Debug|x64
+		{EAE82A56-4F32-4088-9560-BC718ACF34F1}.Debug|x64.Build.0 = Debug|x64
+		{EAE82A56-4F32-4088-9560-BC718ACF34F1}.Release|x64.ActiveCfg = Release|x64
+		{EAE82A56-4F32-4088-9560-BC718ACF34F1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

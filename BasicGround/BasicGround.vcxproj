@@ -96,6 +96,9 @@
     <ProjectReference Include="..\JBFramework\JBFramework.vcxproj">
       <Project>{46fe8eb6-b438-46cd-8da2-f649e80f138e}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\JBLogger\JBLogger.vcxproj">
+      <Project>{eae82a56-4f32-4088-9560-bc718acf34f1}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

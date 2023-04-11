@@ -40,6 +40,12 @@
     <Filter Include="Internal\DirectXMath\XDSP">
       <UniqueIdentifier>{ff8297c6-7a00-456a-bcf6-6b36934469a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Internal\EASTL">
+      <UniqueIdentifier>{8704f815-14a3-4f9e-8f1c-7d7e2548fc86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\EASTL\source">
+      <UniqueIdentifier>{b5f72da4-cfdb-4390-a02a-06c59448c5be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Frames\Frames.cpp">
@@ -56,6 +62,36 @@
     </ClCompile>
     <ClCompile Include="Error\Error.cpp">
       <Filter>Internal\Error</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\source\allocator_eastl.cpp">
+      <Filter>Internal\EASTL\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\source\assert.cpp">
+      <Filter>Internal\EASTL\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\source\atomic.cpp">
+      <Filter>Internal\EASTL\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\source\fixed_pool.cpp">
+      <Filter>Internal\EASTL\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\source\hashtable.cpp">
+      <Filter>Internal\EASTL\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\source\intrusive_list.cpp">
+      <Filter>Internal\EASTL\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\source\numeric_limits.cpp">
+      <Filter>Internal\EASTL\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\source\red_black_tree.cpp">
+      <Filter>Internal\EASTL\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\source\string.cpp">
+      <Filter>Internal\EASTL\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EASTL\source\thread_support.cpp">
+      <Filter>Internal\EASTL\source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
