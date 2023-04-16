@@ -149,6 +149,9 @@
     <ClInclude Include="DirectXMath\XDSP\XDSP.h">
       <Filter>Internal\DirectXMath\XDSP</Filter>
     </ClInclude>
+    <ClInclude Include="Error\ErrorPipe.h">
+      <Filter>Internal\Error</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DirectXMath\Inc\DirectXCollision.inl">
