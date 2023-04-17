@@ -5,14 +5,23 @@
 #include <tchar.h>
 #include <Windows.h>
 
+#include <Error/Error.h>
+#include <../JBFramework/Error/ErrorPipe.h>
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 namespace JBF{
-    class WindowFrame{
-    public:
-        
+    namespace Frame{
+        class WindowFrame{
+        public:
+            WindowFrame();
+
+
+        private:
+            ErrorPipe::Client<TCHAR> ErrorPipeClient;
+        };
     };
 };
 
