@@ -6,6 +6,7 @@
 #include <filesystem>
 
 #include <Common/String.h>
+#include <Error/Error.h>
 #include <../JBFramework/Error/ErrorPipe.h>
 
 
@@ -75,27 +76,42 @@ static inline JBF::Common::String<TCHAR> GetModuleDirectory(){
 
 int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow){
     const DWORD ParentID = GetParentProcessId();
-    if(!ParentID)
+    if(!ParentID){
+        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_NO_PARENT);
+        assert(false);
         return -1;
+    }
 
     const HANDLE ParentHandle = OpenProcess(PROCESS_QUERY_INFORMATION | SYNCHRONIZE, FALSE, ParentID);
-    if(!ParentHandle)
+    if(!ParentHandle){
+        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_CANNOT_LOOKUP_PARENT, ParentID);
+        assert(false);
         return -1;
+    }
 
     const JBF::Common::String<TCHAR> WorkingDirectory = GetModuleDirectory();
-    if(WorkingDirectory.empty())
+    if(WorkingDirectory.empty()){
+        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_NO_MODULE_DIRECTORY);
+        assert(false);
         return -1;
+    }
 
     SetCurrentDirectory(WorkingDirectory.c_str());
 
     FILE* File = nullptr;
     _tfopen_s(&File, LogFileName, _T("wt, ccs=UTF-8"));
-    if(!File)
+    if(!File){
+        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_CANNOT_OPEN_LOG_FILE, std::filesystem::canonical(LogFileName).string<TCHAR>().c_str());
+        assert(false);
         return -1;
+    }
 
     JBF::ErrorPipe::Server<TCHAR> Pipe(ParentID);
-    if(!Pipe.IsValid())
+    if(!Pipe.IsValid()){
+        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::ERRORPIPE_SERVER_CREATE_FAILED);
+        assert(false);
         return -1;
+    }
     
     size_t CurCount = 0;
     JBF::Common::String<TCHAR> TmpStr;

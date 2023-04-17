@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include <Common/String.h>
+#include <Error/Error.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,6 +87,7 @@ namespace JBF{
                         break;
                     }
                     if(BytesRead != sizeof(RawBuffer)){
+                        Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_SERVER_READ_MISMATCH, sizeof(RawBuffer), BytesRead);
                         assert(false);
                         return false;
                     }
@@ -169,10 +171,12 @@ namespace JBF{
                             , nullptr
                             ))
                         {
+                            Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_CLIENT_WRITE_FAILED);
                             assert(false);
                             return;
                         }
                         if(BytesWritten != sizeof(RawBuffer)){
+                            Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_CLIENT_WRITE_MISMATCH, sizeof(RawBuffer), BytesWritten);
                             assert(false);
                             return;
                         }
@@ -193,10 +197,12 @@ namespace JBF{
                             , nullptr
                             ))
                         {
+                            Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_CLIENT_WRITE_FAILED);
                             assert(false);
                             return;
                         }
                         if(BytesWritten != sizeof(RawBuffer)){
+                            Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_CLIENT_WRITE_MISMATCH, sizeof(RawBuffer), BytesWritten);
                             assert(false);
                             return;
                         }

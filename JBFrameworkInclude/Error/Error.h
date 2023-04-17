@@ -4,18 +4,42 @@
 
 #include <tchar.h>
 
+#include <Common/String.h>
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 namespace JBF{
-    enum class ErrorCode : unsigned long{
-        SUCCEEDED,
+    namespace Error{
+        enum class FatalCode : unsigned long{
+            SUCCEEDED,
+
+            ERRORPIPE_SERVER_CREATE_FAILED,
+            ERRORPIPE_CLIENT_CREATE_FAILED,
+
+            ERRORPIPE_CLIENT_WRITE_FAILED,
+            
+            ERRORPIPE_SERVER_READ_MISMATCH,
+            ERRORPIPE_CLIENT_WRITE_MISMATCH,
+
+            LOGGER_NO_PARENT,
+            LOGGER_CANNOT_LOOKUP_PARENT,
+            
+            LOGGER_NO_MODULE_DIRECTORY,
+            LOGGER_CANNOT_OPEN_LOG_FILE,
+        };
+        enum class ErrorCode : unsigned long{
+            SUCCEEDED,
 
         
-    };
+        };
 
-    bool GetErrorMessage();
+        Common::String<TCHAR> GetFatalMessage(FatalCode Code, ...);
+        Common::String<TCHAR> GetErrorMessage(ErrorCode Code, ...);
+
+        void ShowFatalMessage(FatalCode Code, ...);
+    };
 };
 
 
