@@ -155,6 +155,9 @@
     <ClInclude Include="..\JBFrameworkInclude\Common\String.h">
       <Filter>External\Common</Filter>
     </ClInclude>
+    <ClInclude Include="Error\ErrorPipe.h">
+      <Filter>Internal\Error</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DirectXMath\Inc\DirectXCollision.inl">

@@ -131,6 +131,7 @@
     <ClInclude Include="DirectXMath\SHMath\DirectXSH.h" />
     <ClInclude Include="DirectXMath\Stereo3D\Stereo3DMatrixHelper.h" />
     <ClInclude Include="DirectXMath\XDSP\XDSP.h" />
+    <ClInclude Include="Error\ErrorPipe.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DirectXMath\Inc\DirectXCollision.inl" />
