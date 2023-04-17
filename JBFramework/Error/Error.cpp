@@ -36,6 +36,9 @@ namespace JBF{
             case FatalCode::LOGGER_CANNOT_OPEN_LOG_FILE:
                 return Common::FormatWithVaList(_T("Logger couldn't open log file \"%s\"."), VA);
 
+            case FatalCode::LOGGER_WRITE_MISMATCH:
+                return Common::FormatWithVaList(_T("Logger couldn't write to log file. Expected size: %ull, Actual size: %ull."), VA);
+
             default:
                 return _T("Unknown fatal error.");
             }

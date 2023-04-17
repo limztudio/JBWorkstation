@@ -28,6 +28,8 @@ namespace JBF{
             
             LOGGER_NO_MODULE_DIRECTORY,
             LOGGER_CANNOT_OPEN_LOG_FILE,
+
+            LOGGER_WRITE_MISMATCH,
         };
         enum class ErrorCode : unsigned long{
             SUCCEEDED,

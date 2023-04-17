@@ -158,6 +158,9 @@
     <ClInclude Include="Error\ErrorPipe.h">
       <Filter>Internal\Error</Filter>
     </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\Common\Memory.h">
+      <Filter>External\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DirectXMath\Inc\DirectXCollision.inl">

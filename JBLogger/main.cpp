@@ -5,6 +5,7 @@
 #include <string>
 #include <filesystem>
 
+#include <Common/Memory.h>
 #include <Common/String.h>
 #include <Error/Error.h>
 #include <../JBFramework/Error/ErrorPipe.h>
@@ -98,8 +99,12 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, in
 
     SetCurrentDirectory(WorkingDirectory.c_str());
 
-    FILE* File = nullptr;
-    _tfopen_s(&File, LogFileName, _T("wt, ccs=UTF-8"));
+    JBF::Common::UniquePtr<FILE, decltype(fclose)> File(nullptr, fclose);
+    {
+        FILE* Ptr = nullptr;
+        _tfopen_s(&Ptr, LogFileName, _T("wt, ccs=UTF-8"));
+        File.reset(Ptr);
+    }
     if(!File){
         JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_CANNOT_OPEN_LOG_FILE, std::filesystem::canonical(LogFileName).string<TCHAR>().c_str());
         assert(false);
@@ -133,17 +138,28 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, in
 
             if(CurCount >= BufferCount){
                 const size_t WrittenCount = fwrite(StringBuffer.c_str(), sizeof(TCHAR), StringBuffer.length(), File);
-                if(WrittenCount != StringBuffer.length())
-                    break;
+                if(WrittenCount != StringBuffer.length()){
+                    JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_WRITE_MISMATCH, StringBuffer.length(), WrittenCount);
+                    assert(false);
+                    return -1;
+                }
                 
                 CurCount = 0;
                 StringBuffer.clear();
             }
         }
     }
+    if(!StringBuffer.empty()){
+        const size_t WrittenCount = fwrite(StringBuffer.c_str(), sizeof(TCHAR), StringBuffer.length(), File);
+        if(WrittenCount != StringBuffer.length()){
+            JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_WRITE_MISMATCH, StringBuffer.length(), WrittenCount);
+            assert(false);
+            return -1;
+        }
 
-    fclose(File);
-    File = nullptr;
+        CurCount = 0;
+        StringBuffer.clear();
+    }
     
     return 0;
 }
