@@ -46,6 +46,9 @@
     <Filter Include="Internal\EASTL\source">
       <UniqueIdentifier>{b5f72da4-cfdb-4390-a02a-06c59448c5be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\Common">
+      <UniqueIdentifier>{6132d9d8-493f-461f-87d9-d352b8bbf155}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Frames\Frames.cpp">
@@ -148,6 +151,9 @@
     </ClInclude>
     <ClInclude Include="DirectXMath\XDSP\XDSP.h">
       <Filter>Internal\DirectXMath\XDSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\Common\String.h">
+      <Filter>External\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

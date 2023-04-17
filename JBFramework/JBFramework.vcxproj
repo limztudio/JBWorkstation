@@ -112,6 +112,7 @@
     <ClCompile Include="Frames\Frames.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\JBFrameworkInclude\Common\String.h" />
     <ClInclude Include="..\JBFrameworkInclude\Error\Error.h" />
     <ClInclude Include="..\JBFrameworkInclude\Frames\Frames.h" />
     <ClInclude Include="DirectXMath\Extensions\DirectXMathAVX.h" />
