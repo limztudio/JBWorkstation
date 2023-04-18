@@ -113,6 +113,7 @@
     <ClCompile Include="Frames\Frames.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\JBFrameworkInclude\Common\Container.h" />
     <ClInclude Include="..\JBFrameworkInclude\Common\Path.h" />
     <ClInclude Include="..\JBFrameworkInclude\Common\Memory.h" />
     <ClInclude Include="..\JBFrameworkInclude\Common\String.h" />

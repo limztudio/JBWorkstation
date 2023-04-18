@@ -95,6 +95,12 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, in
         assert(false);
         return -1;
     }
+
+    if(!Pipe.WaitUntilConnected()){
+        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::ERRORPIPE_SERVER_CONNECT_FAILED);
+        assert(false);
+        return -1;
+    }
     
     size_t CurCount = 0;
     JBF::Common::String<TCHAR> TmpStr;

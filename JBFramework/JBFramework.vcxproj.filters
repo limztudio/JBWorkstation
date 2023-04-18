@@ -170,6 +170,9 @@
     <ClInclude Include="..\JBFrameworkInclude\Common\Path.h">
       <Filter>External\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\Common\Container.h">
+      <Filter>External\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DirectXMath\Inc\DirectXCollision.inl">

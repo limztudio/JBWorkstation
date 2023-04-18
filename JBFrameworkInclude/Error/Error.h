@@ -18,11 +18,16 @@ namespace JBF{
             ERRORPIPE_SERVER_CREATE_FAILED,
             ERRORPIPE_CLIENT_CREATE_FAILED,
 
+            ERRORPIPE_SERVER_CONNECT_FAILED,
+
             ERRORPIPE_CLIENT_WRITE_FAILED,
             
             ERRORPIPE_SERVER_READ_MISMATCH,
             ERRORPIPE_CLIENT_WRITE_MISMATCH,
 
+            LOGGER_CANNOT_EXECUTE,
+            LOGGER_NOT_VALID_AFTER_EXECUTED,
+            
             LOGGER_NO_PARENT,
             LOGGER_CANNOT_LOOKUP_PARENT,
             
@@ -34,7 +39,7 @@ namespace JBF{
         enum class ErrorCode : unsigned long{
             SUCCEEDED,
 
-        
+            FRAME_WINDOW_REGISTERCLASS_FAILED,
         };
 
         Common::String<TCHAR> GetFatalMessage(FatalCode Code, ...);

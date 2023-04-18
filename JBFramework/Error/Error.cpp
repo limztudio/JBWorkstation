@@ -18,6 +18,9 @@ namespace JBF{
             case FatalCode::ERRORPIPE_CLIENT_CREATE_FAILED:
                 return _T("ErrorPipe client creation failed.");
 
+            case FatalCode::ERRORPIPE_SERVER_CONNECT_FAILED:
+                return _T("ErrorPipe server connecting failed.");
+
             case FatalCode::ERRORPIPE_CLIENT_WRITE_FAILED:
                 return _T("ErrorPipe client writing message failed.");
                 
@@ -26,6 +29,11 @@ namespace JBF{
             case FatalCode::ERRORPIPE_CLIENT_WRITE_MISMATCH:
                 return Common::FormatWithVaList(_T("ErrorPipe client writing message failed. Expected size: %ull, Actual size: %ull."), VA);
 
+            case FatalCode::LOGGER_CANNOT_EXECUTE:
+                return _T("Logger cannot be executed.");
+            case FatalCode::LOGGER_NOT_VALID_AFTER_EXECUTED:
+                return Common::FormatWithVaList(_T("Logger is not valid after executed. Handle: %x."), VA);
+                
             case FatalCode::LOGGER_NO_PARENT:
                 return _T("Logger has no parent.");
             case FatalCode::LOGGER_CANNOT_LOOKUP_PARENT:
@@ -47,6 +55,9 @@ namespace JBF{
             switch(Code){
             case ErrorCode::SUCCEEDED:
                 return _T("Succeeded.");
+
+            case ErrorCode::FRAME_WINDOW_REGISTERCLASS_FAILED:
+                return _T("Frame window registration failed.");
 
             default:
                 return _T("Unknown error.");

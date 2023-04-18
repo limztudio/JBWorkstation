@@ -14,11 +14,48 @@
 
 namespace JBF{
     namespace Frame{
-        class WindowFrame{
+        namespace __hidden{
+            class FrameBase{
+                FrameBase();
+                virtual ~FrameBase();
+
+
+            public:
+                inline bool IsLoggerValid(void** OutHandle)const{
+                    (*OutHandle) = LoggerPI.hProcess;
+                    
+                    if(!LoggerPI.hProcess)
+                        return false;
+
+                    DWORD ExitCode;
+                    if(!GetExitCodeProcess(LoggerPI.hProcess, &ExitCode))
+                        return false;
+
+                    if(ExitCode != STILL_ACTIVE)
+                        return false;
+                    
+                    return true;
+                }
+                inline bool IsLoggerValid()const{
+                    void* Dummy = nullptr;
+                    return IsLoggerValid(&Dummy);
+                }
+                
+                
+            private:
+                PROCESS_INFORMATION LoggerPI;
+            };
+        };
+        
+        class WindowFrame : public __hidden::FrameBase{
         public:
-            WindowFrame();
+            WindowFrame(void* InstanceHandle, const TCHAR* AppName, unsigned Width, unsigned Height);
 
 
+        private:
+            static LRESULT CALLBACK MessageProcessor(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+            
         private:
             ErrorPipe::Client<TCHAR> ErrorPipeClient;
         };

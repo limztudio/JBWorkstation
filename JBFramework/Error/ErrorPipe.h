@@ -6,6 +6,12 @@
 #include <Windows.h>
 #include <cassert>
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+
+#include <Common/Container.h>
 #include <Common/String.h>
 #include <Error/Error.h>
 
@@ -24,6 +30,7 @@ namespace JBF{
         public:
             Server(unsigned long ID)
                 : PipeHandle(nullptr)
+                , bConnected(false)
             {
                 TCHAR CurPath[std::size(PipePath) + 128] = { 0 };
                 memcpy_s(CurPath, sizeof(CurPath), PipePath, sizeof(PipePath));
@@ -46,19 +53,14 @@ namespace JBF{
 
                 if(!PipeHandle)
                     return;
-
-                for(;;){
-                    if(ConnectNamedPipe(PipeHandle, nullptr))
-                        break;
-                    if(GetLastError() == ERROR_PIPE_CONNECTED){
-                        PipeHandle = nullptr;
-                        break;
-                    }
-                }
             }
             ~Server(){
                 if(PipeHandle){
-                    DisconnectNamedPipe(PipeHandle);
+                    if(bConnected){
+                        DisconnectNamedPipe(PipeHandle);
+                        bConnected = false;
+                    }
+                    
                     CloseHandle(PipeHandle);
                 }
             }
@@ -68,11 +70,27 @@ namespace JBF{
             inline bool IsValid()const{ return (PipeHandle != nullptr); }
 
         public:
+            bool WaitUntilConnected(){
+                for(;;){
+                    if(ConnectNamedPipe(PipeHandle, nullptr))
+                        break;
+                    if(GetLastError() == ERROR_PIPE_CONNECTED){
+                        PipeHandle = nullptr;
+                        return false;
+                    }
+                }
+                bConnected = true;
+                return true;
+            }
+            
             bool Read(Common::String<CHARTYPE>& Result){
+                Result.clear();
+                
+                if(!bConnected)
+                    return false;
+                
                 unsigned char RawBuffer[(PipeBufferSize * sizeof(CHARTYPE)) + 1] = { 0 };
                 CHARTYPE* Buffer = reinterpret_cast<CHARTYPE*>(RawBuffer + 1);
-
-                Result.clear();
 
                 for(;;){
                     DWORD BytesRead = 0;
@@ -108,13 +126,16 @@ namespace JBF{
             
         private:
             HANDLE PipeHandle;
+            bool bConnected;
         };
 
         template<typename CHARTYPE = TCHAR>
         class Client{
         public:
             Client(unsigned long ID)
-                : PipeHandle(nullptr)
+                : Thread(ThreadWork, this)
+                , PipeHandle(nullptr)
+                , bExit(false)
             {
                 TCHAR CurPath[std::size(PipePath) + 128] = { 0 };
                 memcpy_s(CurPath, sizeof(CurPath), PipePath, sizeof(PipePath));
@@ -135,9 +156,11 @@ namespace JBF{
                     PipeHandle = nullptr;
             }
             ~Client(){
-                if(PipeHandle){
+                bExit.store(true, std::memory_order_release);
+                Thread.join();
+                
+                if(PipeHandle)
                     CloseHandle(PipeHandle);
-                }
             }
 
 
@@ -145,6 +168,39 @@ namespace JBF{
             inline bool IsValid()const{ return (PipeHandle != nullptr); }
 
         public:
+            void PushMessage(const Common::String<CHARTYPE>& Message){
+                {
+                    std::unique_lock<decltype(Mutex)> Lock(Mutex);
+                    MessageQueue.emplace_back(Message);
+                }
+                Switch.notify_one();
+            }
+            void PushMessage(Common::String<CHARTYPE>&& Message){
+                {
+                    std::unique_lock<decltype(Mutex)> Lock(Mutex);
+                    MessageQueue.emplace_back(std::move(Message));
+                }
+                Switch.notify_one();
+            }
+
+
+        private:
+            static void ThreadWork(Client* This){
+                while(!This->bExit.load(std::memory_order_acquire)){
+                    std::unique_lock<decltype(This->Mutex)> Lock(This->Mutex);
+                    This->Switch.wait(Lock, [This]{
+                        return !This->MessageQueue.empty();
+                    });
+
+                    while(!This->MessageQueue.empty()){
+                        This->Write(This->MessageQueue.front());
+                        This->MessageQueue.pop_front();
+                    }
+                }
+            }
+
+            
+        private:
             void Write(const Common::String<CHARTYPE>& Message){
                 unsigned char RawBuffer[(PipeBufferSize * sizeof(CHARTYPE)) + 1] = { 0 };
                 CHARTYPE* Buffer = reinterpret_cast<CHARTYPE*>(RawBuffer + 1);
@@ -212,6 +268,14 @@ namespace JBF{
                 }
             }
 
+
+        private:
+            std::thread Thread;
+            std::mutex Mutex;
+            std::condition_variable Switch;
+            std::atomic<bool> bExit;
+            
+            Common::Queue<Common::String<CHARTYPE>> MessageQueue;
             
         private:
             HANDLE PipeHandle;
