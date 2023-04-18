@@ -95,6 +95,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Common\Path.cpp" />
     <ClCompile Include="DirectXMath\SHMath\DirectXSH.cpp" />
     <ClCompile Include="DirectXMath\SHMath\DirectXSHD3D12.cpp" />
     <ClCompile Include="DirectXMath\Stereo3D\Stereo3DMatrixHelper.cpp" />
@@ -112,6 +113,7 @@
     <ClCompile Include="Frames\Frames.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\JBFrameworkInclude\Common\Path.h" />
     <ClInclude Include="..\JBFrameworkInclude\Common\Memory.h" />
     <ClInclude Include="..\JBFrameworkInclude\Common\String.h" />
     <ClInclude Include="..\JBFrameworkInclude\Error\Error.h" />

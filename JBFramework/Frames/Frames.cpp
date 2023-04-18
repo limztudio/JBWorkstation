@@ -6,6 +6,20 @@
 
 namespace JBF{
     namespace Frame{
+        namespace __hidden{
+            static inline bool RunLogger(){
+                
+            }
+        };
+    };
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+namespace JBF{
+    namespace Frame{
         WindowFrame::WindowFrame()
             : ErrorPipeClient(GetCurrentProcessId())
         {

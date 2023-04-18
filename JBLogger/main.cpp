@@ -2,11 +2,9 @@
 #include <Windows.h>
 #include <tlhelp32.h>
 
-#include <string>
-#include <filesystem>
-
 #include <Common/Memory.h>
 #include <Common/String.h>
+#include <Common/Path.h>
 #include <Error/Error.h>
 #include <../JBFramework/Error/ErrorPipe.h>
 
@@ -51,26 +49,6 @@ static inline DWORD GetParentProcessId(){
     return PPID;
 }
 
-static inline JBF::Common::String<TCHAR> GetModuleDirectory(){
-    const DWORD StrLen = GetModuleFileName(nullptr, nullptr, 0);
-    if(!StrLen)
-        return JBF::Common::String<TCHAR>();
-
-    std::basic_string<TCHAR> Buffer(StrLen, 0);
-    if(!GetModuleFileName(nullptr, Buffer.data(), StrLen))
-        return JBF::Common::String<TCHAR>();
-
-    std::filesystem::path Result(std::basic_string<TCHAR>(Buffer.begin(), Buffer.end()));
-    Result = Result.parent_path();
-
-    std::error_code ErrorCode;
-    Result = std::filesystem::canonical(Result, ErrorCode);
-    if(ErrorCode)
-        return JBF::Common::String<TCHAR>();
-    
-    return JBF::Common::String<TCHAR>(Result.string<TCHAR>().c_str());
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -90,14 +68,14 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, in
         return -1;
     }
 
-    const JBF::Common::String<TCHAR> WorkingDirectory = GetModuleDirectory();
-    if(WorkingDirectory.empty()){
+    const JBF::Common::Path<TCHAR> WorkingDirectory = JBF::Common::GetModuleDirectory();
+    if(WorkingDirectory.Empty()){
         JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_NO_MODULE_DIRECTORY);
         assert(false);
         return -1;
     }
 
-    SetCurrentDirectory(WorkingDirectory.c_str());
+    SetCurrentDirectory(WorkingDirectory.String().c_str());
 
     JBF::Common::UniquePtr<FILE, decltype(fclose)> File(nullptr, fclose);
     {
@@ -106,7 +84,7 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, in
         File.reset(Ptr);
     }
     if(!File){
-        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_CANNOT_OPEN_LOG_FILE, std::filesystem::canonical(LogFileName).string<TCHAR>().c_str());
+        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_CANNOT_OPEN_LOG_FILE, JBF::Common::Path<TCHAR>(LogFileName).Absolute().String().c_str());
         assert(false);
         return -1;
     }

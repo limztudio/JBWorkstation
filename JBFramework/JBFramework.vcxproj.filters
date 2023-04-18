@@ -49,6 +49,9 @@
     <Filter Include="External\Common">
       <UniqueIdentifier>{6132d9d8-493f-461f-87d9-d352b8bbf155}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Internal\Common">
+      <UniqueIdentifier>{28c44a09-2a41-455f-bb25-7ead8c88f185}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Frames\Frames.cpp">
@@ -95,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="EASTL\source\thread_support.cpp">
       <Filter>Internal\EASTL\source</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Path.cpp">
+      <Filter>Internal\Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +165,9 @@
       <Filter>Internal\Error</Filter>
     </ClInclude>
     <ClInclude Include="..\JBFrameworkInclude\Common\Memory.h">
+      <Filter>External\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\Common\Path.h">
       <Filter>External\Common</Filter>
     </ClInclude>
   </ItemGroup>
