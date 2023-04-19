@@ -69,6 +69,7 @@ namespace JBF{
                 WC.lpszClassName = AppName;
             }
             if(!RegisterClassEx(&WC)){
+                ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_REGISTERCLASS_FAILED));
                 assert(false);
                 return;
             }

@@ -9,7 +9,6 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include <atomic>
 
 #include <Common/Container.h>
 #include <Common/String.h>
@@ -134,8 +133,8 @@ namespace JBF{
         public:
             Client(unsigned long ID)
                 : Thread(ThreadWork, this)
-                , PipeHandle(nullptr)
                 , bExit(false)
+                , PipeHandle(nullptr)
             {
                 TCHAR CurPath[std::size(PipePath) + 128] = { 0 };
                 memcpy_s(CurPath, sizeof(CurPath), PipePath, sizeof(PipePath));
@@ -156,7 +155,12 @@ namespace JBF{
                     PipeHandle = nullptr;
             }
             ~Client(){
-                bExit.store(true, std::memory_order_release);
+                {
+                    std::unique_lock Lock(Mutex);
+                    bExit = true;
+                }
+                Switch.notify_one();
+                
                 Thread.join();
                 
                 if(PipeHandle)
@@ -170,14 +174,14 @@ namespace JBF{
         public:
             void PushMessage(const Common::String<CHARTYPE>& Message){
                 {
-                    std::unique_lock<decltype(Mutex)> Lock(Mutex);
+                    std::unique_lock Lock(Mutex);
                     MessageQueue.emplace_back(Message);
                 }
                 Switch.notify_one();
             }
             void PushMessage(Common::String<CHARTYPE>&& Message){
                 {
-                    std::unique_lock<decltype(Mutex)> Lock(Mutex);
+                    std::unique_lock Lock(Mutex);
                     MessageQueue.emplace_back(std::move(Message));
                 }
                 Switch.notify_one();
@@ -186,16 +190,19 @@ namespace JBF{
 
         private:
             static void ThreadWork(Client* This){
-                while(!This->bExit.load(std::memory_order_acquire)){
-                    std::unique_lock<decltype(This->Mutex)> Lock(This->Mutex);
+                for(;;){
+                    std::unique_lock Lock(This->Mutex);
                     This->Switch.wait(Lock, [This]{
-                        return !This->MessageQueue.empty();
+                        return (This->bExit || (!This->MessageQueue.empty()));
                     });
 
                     while(!This->MessageQueue.empty()){
                         This->Write(This->MessageQueue.front());
                         This->MessageQueue.pop_front();
                     }
+
+                    if(This->bExit)
+                        break;
                 }
             }
 
@@ -273,7 +280,7 @@ namespace JBF{
             std::thread Thread;
             std::mutex Mutex;
             std::condition_variable Switch;
-            std::atomic<bool> bExit;
+            bool bExit;
             
             Common::Queue<Common::String<CHARTYPE>> MessageQueue;
             
