@@ -77,7 +77,7 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, in
 
     SetCurrentDirectory(WorkingDirectory.String().c_str());
 
-    JBF::Common::UniquePtr<FILE, decltype(fclose)> File(nullptr, fclose);
+    JBF::Common::UniquePtr<FILE, void(*)(FILE*)> File(nullptr, [](FILE* f){ fclose(f); });
     {
         FILE* Ptr = nullptr;
         _tfopen_s(&Ptr, LogFileName, _T("wt, ccs=UTF-8"));
@@ -121,7 +121,7 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, in
             ++CurCount;
 
             if(CurCount >= BufferCount){
-                const size_t WrittenCount = fwrite(StringBuffer.c_str(), sizeof(TCHAR), StringBuffer.length(), File);
+                const size_t WrittenCount = fwrite(StringBuffer.c_str(), sizeof(TCHAR), StringBuffer.length(), File.get());
                 if(WrittenCount != StringBuffer.length()){
                     JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_WRITE_MISMATCH, StringBuffer.length(), WrittenCount);
                     assert(false);
@@ -134,7 +134,7 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, in
         }
     }
     if(!StringBuffer.empty()){
-        const size_t WrittenCount = fwrite(StringBuffer.c_str(), sizeof(TCHAR), StringBuffer.length(), File);
+        const size_t WrittenCount = fwrite(StringBuffer.c_str(), sizeof(TCHAR), StringBuffer.length(), File.get());
         if(WrittenCount != StringBuffer.length()){
             JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_WRITE_MISMATCH, StringBuffer.length(), WrittenCount);
             assert(false);

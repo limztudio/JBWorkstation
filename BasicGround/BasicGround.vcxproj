@@ -61,7 +61,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)JBFrameworkInclude\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)JBFramework\;$(SolutionDir)JBFrameworkInclude\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -78,7 +78,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)JBFrameworkInclude\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)JBFramework\;$(SolutionDir)JBFrameworkInclude\</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <StringPooling>true</StringPooling>

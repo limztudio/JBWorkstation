@@ -1,6 +1,7 @@
-#include <Error/Error.h>
-
+#include <tchar.h>
 #include <Windows.h>
+
+#include <Common/String.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8,7 +9,12 @@
 
 namespace JBF{
     namespace Error{
-        Common::String<TCHAR> GetFatalMessageWithVaList(FatalCode Code, va_list VA){
+        enum class FatalCode : unsigned long;
+        enum class ErrorCode : unsigned long;
+
+        
+        template<typename... ARGS>
+        Common::String<TCHAR> GetFatalMessage(FatalCode Code, ARGS&&... Args){
             switch(Code){
             case FatalCode::SUCCEEDED:
                 return _T("Succeeded.");
@@ -25,33 +31,34 @@ namespace JBF{
                 return _T("ErrorPipe client writing message failed.");
                 
             case FatalCode::ERRORPIPE_SERVER_READ_MISMATCH:
-                return Common::FormatWithVaList(_T("ErrorPipe server reading message failed. Expected size: %ull, Actual size: %ull."), VA);
+                return Common::Format(_T("ErrorPipe server reading message failed. Expected size: %ull, Actual size: %ull."), std::forward<ARGS>(Args)...);
             case FatalCode::ERRORPIPE_CLIENT_WRITE_MISMATCH:
-                return Common::FormatWithVaList(_T("ErrorPipe client writing message failed. Expected size: %ull, Actual size: %ull."), VA);
+                return Common::Format(_T("ErrorPipe client writing message failed. Expected size: %ull, Actual size: %ull."), std::forward<ARGS>(Args)...);
 
             case FatalCode::LOGGER_CANNOT_EXECUTE:
                 return _T("Logger cannot be executed.");
             case FatalCode::LOGGER_NOT_VALID_AFTER_EXECUTED:
-                return Common::FormatWithVaList(_T("Logger is not valid after executed. Handle: %x."), VA);
+                return Common::Format(_T("Logger is not valid after executed. Handle: %x."), std::forward<ARGS>(Args)...);
                 
             case FatalCode::LOGGER_NO_PARENT:
                 return _T("Logger has no parent.");
             case FatalCode::LOGGER_CANNOT_LOOKUP_PARENT:
-                return Common::FormatWithVaList(_T("Logger couldn't look up parent process %x."), VA);
+                return Common::Format(_T("Logger couldn't look up parent process %x."), std::forward<ARGS>(Args)...);
 
             case FatalCode::LOGGER_NO_MODULE_DIRECTORY:
                 return _T("Logger couldn't find current module directory.");
             case FatalCode::LOGGER_CANNOT_OPEN_LOG_FILE:
-                return Common::FormatWithVaList(_T("Logger couldn't open log file \"%s\"."), VA);
+                return Common::Format(_T("Logger couldn't open log file \"%s\"."), std::forward<ARGS>(Args)...);
 
             case FatalCode::LOGGER_WRITE_MISMATCH:
-                return Common::FormatWithVaList(_T("Logger couldn't write to log file. Expected size: %ull, Actual size: %ull."), VA);
+                return Common::Format(_T("Logger couldn't write to log file. Expected size: %ull, Actual size: %ull."), std::forward<ARGS>(Args)...);
 
             default:
                 return _T("Unknown fatal error.");
             }
         }
-        Common::String<TCHAR> GetErrorMessageWithVaList(ErrorCode Code, va_list VA){
+        template<typename... ARGS>
+        Common::String<TCHAR> GetErrorMessage(ErrorCode Code, ARGS&&... Args){
             switch(Code){
             case ErrorCode::SUCCEEDED:
                 return _T("Succeeded.");
@@ -63,7 +70,7 @@ namespace JBF{
             case ErrorCode::FRAME_WINDOW_ADJUST_FAILED:
                 return _T("Frame window adjustment failed.");
             case ErrorCode::FRAME_WINDOW_MOVE_FAILED:
-                return Common::FormatWithVaList(_T("Frame window moving failed. HWND: %x"), VA);
+                return Common::Format(_T("Frame window moving failed. HWND: %x"), std::forward<ARGS>(Args)...);
 
             case ErrorCode::FRAME_INIT_FAILED:
                 return _T("Frame initialization failed.");
@@ -76,29 +83,10 @@ namespace JBF{
                 return _T("Unknown error.");
             }
         }
-    
-        Common::String<TCHAR> GetFatalMessage(FatalCode Code, ...){
-            va_list VA;
-            va_start(VA, Code);
-            auto Result = GetFatalMessageWithVaList(Code, VA);
-            va_end(VA);
-            return std::move(Result);
-        }
-        Common::String<TCHAR> GetErrorMessage(ErrorCode Code, ...){
-            va_list VA;
-            va_start(VA, Code);
-            auto Result = GetErrorMessageWithVaList(Code, VA);
-            va_end(VA);
-            return std::move(Result);
-        }
 
-        void ShowFatalMessage(FatalCode Code, ...){
-            va_list VA;
-            va_start(VA, Code);
-            auto Result = GetFatalMessageWithVaList(Code, VA);
-            va_end(VA);
-
-            MessageBox(nullptr, Result.c_str(), _T("Fatal Error"), MB_OK | MB_ICONERROR);
+        template<typename... ARGS>
+        void ShowFatalMessage(FatalCode Code, ARGS&&... Args){
+            MessageBox(nullptr, GetFatalMessage(Code, std::forward<ARGS>(Args)...).c_str(), _T("Fatal Error"), MB_OK | MB_ICONERROR);
         }
     };
 };

@@ -182,7 +182,7 @@ namespace JBF{
             void PushMessage(Common::String<CHARTYPE>&& Message){
                 {
                     std::unique_lock Lock(Mutex);
-                    MessageQueue.emplace_back(std::move(Message));
+                    MessageQueue.emplace(std::move(Message));
                 }
                 Switch.notify_one();
             }
@@ -198,7 +198,7 @@ namespace JBF{
 
                     while(!This->MessageQueue.empty()){
                         This->Write(This->MessageQueue.front());
-                        This->MessageQueue.pop_front();
+                        This->MessageQueue.pop();
                     }
 
                     if(This->bExit)
@@ -294,5 +294,5 @@ namespace JBF{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#endif _ERRORPIPE_H_
+#endif
 

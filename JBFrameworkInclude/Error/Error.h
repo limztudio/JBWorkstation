@@ -48,14 +48,6 @@ namespace JBF{
             FRAME_DESTROY_FAILED,
             FRAME_UPDATE_FAILED,
         };
-
-        extern Common::String<TCHAR> GetFatalMessageWithVaList(FatalCode Code, va_list VA);
-        extern Common::String<TCHAR> GetErrorMessageWithVaList(ErrorCode Code, va_list VA);
-
-        extern Common::String<TCHAR> GetFatalMessage(FatalCode Code, ...);
-        extern Common::String<TCHAR> GetErrorMessage(ErrorCode Code, ...);
-
-        void ShowFatalMessage(FatalCode Code, ...);
     };
 };
 
@@ -63,5 +55,8 @@ namespace JBF{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#endif _ERROR_H_
+#include <../JBFramework/Error/Error.hpp>
+
+
+#endif
 

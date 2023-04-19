@@ -15,6 +15,11 @@ namespace JBF{
     namespace Common{
         template<typename T = TCHAR>
         class Path{
+        private:
+            typedef String<T> StringType;
+            typedef StringView<T> StringViewType;
+
+            
         public:
             Path() = default;
             Path(const Path&) = default;
@@ -28,10 +33,10 @@ namespace JBF{
             Path(std::filesystem::path&& Rhs)noexcept : Actual(std::move(Rhs)){}
         public:
             Path(const T* String) : Actual(String){}
-            Path(const String<T>& String) : Actual(String.c_str()){}
-            Path(String<T>&& String)noexcept : Actual(String.c_str()){ String.clear(); }
-            Path(const StringView<T>& String) : Actual(String.data()){}
-            Path(StringView<T>&& String)noexcept : Actual(String.data()){}
+            Path(const StringType& String) : Actual(String.c_str()){}
+            Path(StringType&& String)noexcept : Actual(String.c_str()){ String.clear(); }
+            Path(const StringViewType& String) : Actual(String.data()){}
+            Path(StringViewType&& String)noexcept : Actual(String.data()){}
 
         public:
             Path& operator/=(const Path& Rhs){
@@ -44,8 +49,8 @@ namespace JBF{
             }
 
         public:
-            String<T> String()const{ return String<T>(Actual.string<T>().c_str()); }
-            operator String<T>()const{ return String(); }
+            StringType String()const{ return StringType(Actual.string<T>().c_str()); }
+            operator StringType()const{ return StringType(Actual.string<T>().c_str()); }
 
 
         public:

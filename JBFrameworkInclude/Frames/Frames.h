@@ -13,14 +13,18 @@
 
 
 namespace JBF{
-    extern void PushLog(const Common::String<TCHAR>& Message);
-    extern void PushLog(Common::String<TCHAR>&& Message);
-    extern void PushLog(const TCHAR* Message, ...);
-    extern void PushLog(const Common::StringView<TCHAR>& Message, ...);
+    template<typename... ARGS>
+    extern void PushLog(const Common::String<TCHAR>& Message, ARGS&&... Args);
+    template<typename... ARGS>
+    extern void PushLog(Common::String<TCHAR>&& Message, ARGS&&... Args);
+    template<typename... ARGS>
+    extern void PushLog(const Common::StringView<TCHAR>& Message, ARGS&&... Args);
+    template<typename... ARGS>
+    extern void PushLog(const TCHAR* Message, ARGS&&... Args);
 
-    extern void PushError(Error::ErrorCode Code);
-    extern void PushError(Error::ErrorCode Code, ...);
-    
+    template<typename... ARGS>
+    extern void PushError(Error::ErrorCode Code, ARGS&&... Args);
+
     
     namespace Frame{
         namespace __hidden{
@@ -96,13 +100,17 @@ namespace JBF{
 
 
         public:
-            friend void JBF::PushLog(const Common::String<TCHAR>& Message);
-            friend void JBF::PushLog(Common::String<TCHAR>&& Message);
-            friend void JBF::PushLog(const TCHAR* Message, ...);
-            friend void JBF::PushLog(const Common::StringView<TCHAR>& Message, ...);
+            template<typename... ARGS>
+            friend void JBF::PushLog(const Common::String<TCHAR>& Message, ARGS&&... Args);
+            template<typename... ARGS>
+            friend void JBF::PushLog(Common::String<TCHAR>&& Message, ARGS&&... Args);
+            template<typename... ARGS>
+            friend void JBF::PushLog(const Common::StringView<TCHAR>& Message, ARGS&&... Args);
+            template<typename... ARGS>
+            friend void JBF::PushLog(const TCHAR* Message, ARGS&&... Args);
 
-            friend void JBF::PushError(Error::ErrorCode Code);
-            friend void JBF::PushError(Error::ErrorCode Code, ...);
+            template<typename... ARGS>
+            friend void JBF::PushError(Error::ErrorCode Code, ARGS&&... Args);
         };
     };
 
@@ -110,36 +118,38 @@ namespace JBF{
     extern Frame::WindowFrame* MainFrame;
 
 
-    inline void PushLog(const Common::String<TCHAR>& Message){
-        MainFrame->ErrorPipeClient.PushMessage(Message);
+    template<typename... ARGS>
+    inline void PushLog(const Common::String<TCHAR>& Message, ARGS&&... Args){
+        if(sizeof...(ARGS) > 0)
+            MainFrame->ErrorPipeClient.PushMessage(Common::Format<TCHAR>(Message, std::forward<ARGS>(Args)...));
+        else
+            MainFrame->ErrorPipeClient.PushMessage(Message);
     }
-    inline void PushLog(Common::String<TCHAR>&& Message){
-        MainFrame->ErrorPipeClient.PushMessage(std::move(Message));
+    template<typename... ARGS>
+    inline void PushLog(Common::String<TCHAR>&& Message, ARGS&&... Args){
+        if(sizeof...(ARGS) > 0)
+            MainFrame->ErrorPipeClient.PushMessage(Common::Format<TCHAR>(Message, std::forward<ARGS>(Args)...));
+        else
+            MainFrame->ErrorPipeClient.PushMessage(std::move(Message));
     }
-    inline void PushLog(const TCHAR* Message, ...){
-        va_list VA;
-        va_start(VA, Message);
-        auto Str = Common::FormatWithVaList<TCHAR>(Message, VA);
-        va_end(VA);
-        MainFrame->ErrorPipeClient.PushMessage(std::move(Str));
+    template<typename... ARGS>
+    inline void PushLog(const Common::StringView<TCHAR>& Message, ARGS&&... Args){
+        if(sizeof...(ARGS) > 0)
+            MainFrame->ErrorPipeClient.PushMessage(Common::Format<TCHAR>(Message, std::forward<ARGS>(Args)...));
+        else
+            MainFrame->ErrorPipeClient.PushMessage(Message.data());
     }
-    inline void PushLog(const Common::StringView<TCHAR>& Message, ...){
-        va_list VA;
-        va_start(VA, Message);
-        auto Str = Common::FormatWithVaList<TCHAR>(Message, VA);
-        va_end(VA);
-        MainFrame->ErrorPipeClient.PushMessage(std::move(Str));
+    template<typename... ARGS>
+    inline void PushLog(const TCHAR* Message, ARGS&&... Args){
+        if(sizeof...(ARGS) > 0)
+            MainFrame->ErrorPipeClient.PushMessage(Common::Format<TCHAR>(Message, std::forward<ARGS>(Args)...));
+        else
+            MainFrame->ErrorPipeClient.PushMessage(Message);
     }
 
-    inline void PushError(Error::ErrorCode Code){
-        MainFrame->ErrorPipeClient.PushMessage(Error::GetErrorMessage(Code));
-    }
-    inline void PushError(Error::ErrorCode Code, ...){
-        va_list VA;
-        va_start(VA, Code);
-        auto Str = Error::GetErrorMessageWithVaList(Code, VA);
-        va_end(VA);
-        MainFrame->ErrorPipeClient.PushMessage(std::move(Str));
+    template<typename... ARGS>
+    inline void PushError(Error::ErrorCode Code, ARGS&&... Args){
+        MainFrame->ErrorPipeClient.PushMessage(Error::GetErrorMessage(Code, std::forward<ARGS>(Args)...));
     }
 };
 
@@ -147,5 +157,5 @@ namespace JBF{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#endif _FRAMES_H_
+#endif
 

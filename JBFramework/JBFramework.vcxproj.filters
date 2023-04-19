@@ -52,6 +52,18 @@
     <Filter Include="Internal\Common">
       <UniqueIdentifier>{28c44a09-2a41-455f-bb25-7ead8c88f185}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Internal\EAStdC">
+      <UniqueIdentifier>{79c2685c-e3ec-4dd8-baf9-a62ea18f2eb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\EAStdC\source">
+      <UniqueIdentifier>{1ded41e6-84ab-4bbe-97db-8b609a863f95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\EAAssert">
+      <UniqueIdentifier>{ec34b743-c9d2-4904-a025-3ef76929fbe5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Internal\EAAssert\source">
+      <UniqueIdentifier>{916309ec-cb41-4cb4-8c9d-b03eb848b375}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Frames\Frames.cpp">
@@ -66,7 +78,7 @@
     <ClCompile Include="DirectXMath\Stereo3D\Stereo3DMatrixHelper.cpp">
       <Filter>Internal\DirectXMath\Stereo3D</Filter>
     </ClCompile>
-    <ClCompile Include="Error\Error.cpp">
+    <ClCompile Include="Error\Error.hpp">
       <Filter>Internal\Error</Filter>
     </ClCompile>
     <ClCompile Include="EASTL\source\allocator_eastl.cpp">
@@ -101,6 +113,69 @@
     </ClCompile>
     <ClCompile Include="Common\Path.cpp">
       <Filter>Internal\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EACallback.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EACType.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EADateTime.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAFixedPoint.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAGlobal.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAHashCRC.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAHashString.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAMemory.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAProcess.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EARandom.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAScanf.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAScanfCore.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EASprintf.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EASprintfCore.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EASprintfOrdered.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAStdC.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAStopwatch.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EAString.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\EATextUtil.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAStdC\source\Int128_t.cpp">
+      <Filter>Internal\EAStdC\source</Filter>
+    </ClCompile>
+    <ClCompile Include="EAAssert\source\eaassert.cpp">
+      <Filter>Internal\EAAssert\source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
