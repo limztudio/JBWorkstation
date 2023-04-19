@@ -65,6 +65,11 @@ namespace JBF{
             case ErrorCode::FRAME_WINDOW_MOVE_FAILED:
                 return Common::FormatWithVaList(_T("Frame window moving failed. HWND: %x"), VA);
 
+            case ErrorCode::FRAME_INIT_FAILED:
+                return _T("Frame initialization failed.");
+            case ErrorCode::FRAME_UPDATE_FAILED:
+                return _T("Frame update failed.");
+
             default:
                 return _T("Unknown error.");
             }

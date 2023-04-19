@@ -43,10 +43,16 @@ namespace JBF{
             FRAME_WINDOW_CREATE_FAILED,
             FRAME_WINDOW_ADJUST_FAILED,
             FRAME_WINDOW_MOVE_FAILED,
+
+            FRAME_INIT_FAILED,
+            FRAME_UPDATE_FAILED,
         };
 
-        Common::String<TCHAR> GetFatalMessage(FatalCode Code, ...);
-        Common::String<TCHAR> GetErrorMessage(ErrorCode Code, ...);
+        extern Common::String<TCHAR> GetFatalMessageWithVaList(FatalCode Code, va_list VA);
+        extern Common::String<TCHAR> GetErrorMessageWithVaList(ErrorCode Code, va_list VA);
+
+        extern Common::String<TCHAR> GetFatalMessage(FatalCode Code, ...);
+        extern Common::String<TCHAR> GetErrorMessage(ErrorCode Code, ...);
 
         void ShowFatalMessage(FatalCode Code, ...);
     };

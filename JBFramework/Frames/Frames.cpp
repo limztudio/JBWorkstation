@@ -1,5 +1,7 @@
 #include <Frames/Frames.h>
 
+#include <chrono>
+
 #include <Common/Path.h>
 
 
@@ -38,11 +40,15 @@ namespace JBF{
 
 
 namespace JBF{
+    Frame::WindowFrame* MainFrame = nullptr;
+
+    
     namespace Frame{
         WindowFrame::WindowFrame(void* InstanceHandle, const TCHAR* AppName, unsigned Width, unsigned Height)
             : FrameBase()
             , ErrorPipeClient(GetCurrentProcessId())
             , WindowHandle(nullptr)
+            , bIsActive(false)
         {
             void* LoggerHandle = nullptr;
             if(!IsLoggerValid(&LoggerHandle)){
@@ -120,28 +126,98 @@ namespace JBF{
                     return;
                 }
             }
+
+            MainFrame = this;
+        }
+        WindowFrame::~WindowFrame(){
+            MainFrame = nullptr;
+        }
+
+
+        bool WindowFrame::Init(){
+            if(!InitInternal()){
+                ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_INIT_FAILED));
+                assert(false);
+                return false;
+            }
+            
+            ShowWindow(WindowHandle, SW_SHOW);
+            return true;
+        }
+        bool WindowFrame::Run(){
+            MSG Message = {};
+
+            std::chrono::steady_clock::time_point LateTime(std::chrono::steady_clock::now());
+            
+            for(;;){
+                for(;;){
+                    if(bIsActive){
+                        if(!PeekMessage(&Message, nullptr, 0, 0, PM_REMOVE))
+                            break;
+                    }
+                    else
+                        GetMessage(&Message, nullptr, 0, 0);
+
+                    if(Message.message == WM_QUIT)
+                        return true;
+
+                    TranslateMessage(&Message);
+                    DispatchMessage(&Message);
+                }
+
+                std::chrono::steady_clock::time_point CurrentTime(std::chrono::steady_clock::now());
+                std::chrono::duration<float, std::chrono::seconds::period> TimeDifference(CurrentTime - LateTime);
+                LateTime = CurrentTime;
+                
+                if(!UpdateInternal(TimeDifference.count())){
+                    ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_UPDATE_FAILED));
+                    assert(false);
+                    break;
+                }
+            }
+            return false;
+        }
+
+
+        bool WindowFrame::InitInternal(){
+            return true;
+        }
+        bool WindowFrame::UpdateInternal(float TimeDelta){
+            return true;
         }
 
 
         LRESULT CALLBACK WindowFrame::MessageProcessor(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
-            PAINTSTRUCT PS;
-    
-            switch(message){
-            case WM_DESTROY:
-                PostQuitMessage(0);
-                return 0;
+            if(WindowFrame* This = MainFrame){
+                PAINTSTRUCT PS;
+                
+                switch(message){
+                case WM_DESTROY:
+                    PostQuitMessage(0);
+                    return 0;
 
-            case WM_PAINT:
-                if(HDC hDC = BeginPaint(hWnd, &PS)){
+                case WM_ACTIVATE:
+                    switch(LOWORD(wParam)){
+                    case WA_INACTIVE:
+                        This->bIsActive = false;
+                        break;
+                    default:
+                        This->bIsActive = true;
+                        break;
+                    }
+                    return 0;
+
+                case WM_PAINT:
+                    if(HDC hDC = BeginPaint(hWnd, &PS)){
                     
-                    EndPaint(hWnd, &PS);
-                }
-                return 0;
+                        EndPaint(hWnd, &PS);
+                    }
+                    return 0;
 
-            default:
-                break;
+                default:
+                    break;
+                }
             }
-    
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
     };
