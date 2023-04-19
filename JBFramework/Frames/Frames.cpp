@@ -130,6 +130,10 @@ namespace JBF{
             MainFrame = this;
         }
         WindowFrame::~WindowFrame(){
+            if(!DestroyInternal()){
+                ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_DESTROY_FAILED));
+                assert(false);
+            }
             MainFrame = nullptr;
         }
 
@@ -180,6 +184,9 @@ namespace JBF{
 
 
         bool WindowFrame::InitInternal(){
+            return true;
+        }
+        bool WindowFrame::DestroyInternal(){
             return true;
         }
         bool WindowFrame::UpdateInternal(float TimeDelta){

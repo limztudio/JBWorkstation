@@ -67,6 +67,8 @@ namespace JBF{
 
             case ErrorCode::FRAME_INIT_FAILED:
                 return _T("Frame initialization failed.");
+            case ErrorCode::FRAME_DESTROY_FAILED:
+                return _T("Frame destruction failed.");
             case ErrorCode::FRAME_UPDATE_FAILED:
                 return _T("Frame update failed.");
 

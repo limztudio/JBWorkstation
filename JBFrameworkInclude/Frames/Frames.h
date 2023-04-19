@@ -25,6 +25,7 @@ namespace JBF{
     namespace Frame{
         namespace __hidden{
             class FrameBase{
+            public:
                 FrameBase();
                 virtual ~FrameBase();
 
@@ -78,6 +79,7 @@ namespace JBF{
 
         private:
             bool InitInternal();
+            bool DestroyInternal();
             bool UpdateInternal(float TimeDelta);
 
 

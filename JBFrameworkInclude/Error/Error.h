@@ -45,6 +45,7 @@ namespace JBF{
             FRAME_WINDOW_MOVE_FAILED,
 
             FRAME_INIT_FAILED,
+            FRAME_DESTROY_FAILED,
             FRAME_UPDATE_FAILED,
         };
 
