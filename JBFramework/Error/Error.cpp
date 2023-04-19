@@ -58,6 +58,12 @@ namespace JBF{
 
             case ErrorCode::FRAME_WINDOW_REGISTERCLASS_FAILED:
                 return _T("Frame window registration failed.");
+            case ErrorCode::FRAME_WINDOW_CREATE_FAILED:
+                return _T("Frame window creation failed.");
+            case ErrorCode::FRAME_WINDOW_ADJUST_FAILED:
+                return _T("Frame window adjustment failed.");
+            case ErrorCode::FRAME_WINDOW_MOVE_FAILED:
+                return Common::FormatWithVaList(_T("Frame window moving failed. HWND: %x"), VA);
 
             default:
                 return _T("Unknown error.");

@@ -40,6 +40,9 @@ namespace JBF{
             SUCCEEDED,
 
             FRAME_WINDOW_REGISTERCLASS_FAILED,
+            FRAME_WINDOW_CREATE_FAILED,
+            FRAME_WINDOW_ADJUST_FAILED,
+            FRAME_WINDOW_MOVE_FAILED,
         };
 
         Common::String<TCHAR> GetFatalMessage(FatalCode Code, ...);

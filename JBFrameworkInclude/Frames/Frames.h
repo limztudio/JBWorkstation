@@ -52,12 +52,19 @@ namespace JBF{
             WindowFrame(void* InstanceHandle, const TCHAR* AppName, unsigned Width, unsigned Height);
 
 
+        public:
+            inline bool IsValid()const{ return WindowHandle != nullptr; }
+
+
         private:
             static LRESULT CALLBACK MessageProcessor(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
             
         private:
             ErrorPipe::Client<TCHAR> ErrorPipeClient;
+
+        private:
+            HWND WindowHandle;
         };
     };
 };

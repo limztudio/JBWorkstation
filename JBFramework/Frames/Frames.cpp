@@ -42,6 +42,7 @@ namespace JBF{
         WindowFrame::WindowFrame(void* InstanceHandle, const TCHAR* AppName, unsigned Width, unsigned Height)
             : FrameBase()
             , ErrorPipeClient(GetCurrentProcessId())
+            , WindowHandle(nullptr)
         {
             void* LoggerHandle = nullptr;
             if(!IsLoggerValid(&LoggerHandle)){
@@ -72,6 +73,52 @@ namespace JBF{
                 ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_REGISTERCLASS_FAILED));
                 assert(false);
                 return;
+            }
+
+            static constexpr DWORD StyleEx = 0;
+            static constexpr DWORD Style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+
+            RECT RC = {0, 0, static_cast<long>(Width), static_cast<long>(Height)};
+
+            WindowHandle = CreateWindowEx(
+                StyleEx,
+                WC.lpszClassName,
+                AppName,
+                Style,
+                RC.right - RC.left,
+                RC.bottom - RC.top,
+                Width,
+                Height,
+                nullptr,
+                nullptr,
+                WC.hInstance,
+                nullptr
+            );
+            if(!WindowHandle){
+                ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_CREATE_FAILED));
+                assert(false);
+                return;
+            }
+
+            {
+                if(!AdjustWindowRectEx(&RC, Style, FALSE, StyleEx)){
+                    ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_ADJUST_FAILED));
+                    WindowHandle = nullptr;
+                    assert(false);
+                    return;
+                }
+
+                const long ActualWidth = RC.right - RC.left;
+                const long ActualHeight = RC.bottom - RC.top;
+                const long X = (GetSystemMetrics(SM_CXSCREEN) - ActualWidth) >> 1;
+                const long Y = (GetSystemMetrics(SM_CYSCREEN) - ActualHeight) >> 1;
+    
+                if(!MoveWindow(WindowHandle, X, Y, ActualWidth, ActualHeight, false)){
+                    ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_MOVE_FAILED, WindowHandle));
+                    WindowHandle = nullptr;
+                    assert(false);
+                    return;
+                }
             }
         }
 
