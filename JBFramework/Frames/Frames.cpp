@@ -169,6 +169,9 @@ namespace JBF{
                     DispatchMessage(&Message);
                 }
 
+                if(!IsLoggerValid())
+                    return true;
+
                 std::chrono::steady_clock::time_point CurrentTime(std::chrono::steady_clock::now());
                 std::chrono::duration<float, std::chrono::seconds::period> TimeDifference(CurrentTime - LateTime);
                 LateTime = CurrentTime;

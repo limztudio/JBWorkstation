@@ -40,7 +40,7 @@ namespace JBF{
                 PipeHandle = CreateNamedPipe(
                 CurPath
                     , PIPE_ACCESS_INBOUND
-                    , PIPE_READMODE_MESSAGE | PIPE_WAIT
+                    , PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
                     , 1
                     , (PipeBufferSize * sizeof(CHARTYPE)) + 1
                     , (PipeBufferSize * sizeof(CHARTYPE)) + 1
