@@ -174,6 +174,7 @@ namespace eastl
 		// user needs to override the implementation of the allocator class.
 		void* operator new[](size_t size, const char* pName, int flags, unsigned debugFlags, const char* file, int line);
 		void* operator new[](size_t size, size_t alignment, size_t alignmentOffset, const char* pName, int flags, unsigned debugFlags, const char* file, int line);
+        void operator delete[](void* p, size_t size);
 	#endif
 
 	namespace eastl
@@ -282,7 +283,7 @@ namespace eastl
 		}
 
 
-		inline void allocator::deallocate(void* p, size_t)
+		inline void allocator::deallocate(void* p, size_t n)
 		{
 			#if EASTL_DLL
 				if (p != nullptr)
@@ -291,7 +292,7 @@ namespace eastl
 					delete[](char*)pOriginalAllocation;
 				}
 			#else
-				delete[](char*)p;
+				::delete[](char*)p;
 			#endif
 		}
 

@@ -45,7 +45,15 @@
 #endif // EASTL_USER_DEFINED_ALLOCATOR
 
 
-
+void* operator new[](size_t size, const char* pName, int flags, unsigned debugFlags, const char* file, int line){
+    return _aligned_malloc(size, 1);
+}
+void* operator new[](size_t size, size_t alignment, size_t alignmentOffset, const char* pName, int flags, unsigned debugFlags, const char* file, int line){
+    return _aligned_malloc(size, alignment);
+}
+void operator delete[](void* p, size_t size){
+    _aligned_free(p);
+}
 
 
 

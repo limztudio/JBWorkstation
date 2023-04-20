@@ -269,4 +269,9 @@
       <Filter>Internal\DirectXMath\Inc</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="EASTL\EASTL.natvis">
+      <Filter>Internal\EASTL</Filter>
+    </Natvis>
+  </ItemGroup>
 </Project>
