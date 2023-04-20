@@ -91,8 +91,14 @@ namespace JBF{
                 unsigned char RawBuffer[(PipeBufferSize * sizeof(CHARTYPE)) + 1] = { 0 };
                 CHARTYPE* Buffer = reinterpret_cast<CHARTYPE*>(RawBuffer + 1);
 
+                DWORD BytesRead = 0;
+                if(!PeekNamedPipe(PipeHandle, nullptr, 0, nullptr, &BytesRead, nullptr))
+                    return false;
+                if(BytesRead < sizeof(RawBuffer))
+                    return false;
+
                 for(;;){
-                    DWORD BytesRead = 0;
+                    BytesRead = 0;
                     if(!ReadFile(
                         PipeHandle
                         , RawBuffer
@@ -100,9 +106,8 @@ namespace JBF{
                         , &BytesRead,
                         nullptr
                         ))
-                    {
                         break;
-                    }
+
                     if(BytesRead != sizeof(RawBuffer)){
                         Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_SERVER_READ_MISMATCH, sizeof(RawBuffer), BytesRead);
                         assert(false);
