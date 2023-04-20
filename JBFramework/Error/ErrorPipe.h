@@ -39,7 +39,7 @@ namespace JBF{
                 memcpy_s(CurPath + std::size(PipePath) - 1, (std::size(CurPath) - std::size(PipePath) + 1) * sizeof(TCHAR), MainHandleStr.c_str(), MainHandleStr.length() * sizeof(TCHAR));
                 
                 PipeHandle = CreateNamedPipe(
-                CurPath
+                    CurPath
                     , PIPE_ACCESS_INBOUND
                     , PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
                     , 1
