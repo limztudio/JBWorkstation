@@ -2,6 +2,8 @@
 #include <Windows.h>
 #include <tlhelp32.h>
 
+#include <chrono>
+
 #include <Common/Memory.h>
 #include <Common/String.h>
 #include <Common/Path.h>
@@ -116,6 +118,8 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, in
             break;
 
         if(Pipe.Read(TmpStr)){
+            const auto CurrentTime = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
+            StringBuffer += std::format(_T("[{:%H:%M:%S %X}] "), CurrentTime).c_str();
             StringBuffer += TmpStr;
             StringBuffer += _T("\n");
             ++CurCount;
