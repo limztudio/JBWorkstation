@@ -46,7 +46,7 @@ namespace JBF{
     namespace Frame{
         WindowFrame::WindowFrame(void* InstanceHandle, const TCHAR* AppName, unsigned Width, unsigned Height)
             : FrameBase()
-            , ErrorPipeClient(GetCurrentProcessId())
+            , ErrorPipeClient(GetCurrentProcessId(), 10000)
             , WindowHandle(nullptr)
             , bIsActive(false)
         {

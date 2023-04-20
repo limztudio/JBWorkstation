@@ -119,7 +119,7 @@ int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, in
 
         if(Pipe.Read(TmpStr)){
             const auto CurrentTime = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
-            StringBuffer += std::format(_T("[{:%H:%M:%S %X}] "), CurrentTime).c_str();
+            StringBuffer += std::format(_T("[{:%X}] "), CurrentTime).c_str();
             StringBuffer += TmpStr;
             StringBuffer += _T("\n");
             ++CurCount;

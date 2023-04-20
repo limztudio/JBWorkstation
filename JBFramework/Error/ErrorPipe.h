@@ -9,6 +9,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
 
 #include <Common/Container.h>
 #include <Common/String.h>
@@ -136,7 +137,7 @@ namespace JBF{
         template<typename CHARTYPE = TCHAR>
         class Client{
         public:
-            Client(unsigned long ID)
+            Client(unsigned long ID, unsigned long WaitTimeInMillisecond)
                 : Thread(ThreadWork, this)
                 , bExit(false)
                 , PipeHandle(nullptr)
@@ -146,18 +147,28 @@ namespace JBF{
 
                 const Common::String MainHandleStr = Common::ToString(ID);
                 memcpy_s(CurPath + std::size(PipePath) - 1, (std::size(CurPath) - std::size(PipePath) + 1) * sizeof(TCHAR), MainHandleStr.c_str(), MainHandleStr.length() * sizeof(TCHAR));
-                
-                PipeHandle = CreateFile(
-                    CurPath
-                    , GENERIC_WRITE
-                    , 0
-                    , nullptr
-                    , OPEN_EXISTING
-                    , 0
-                    , nullptr
-                    );
-                if(PipeHandle == INVALID_HANDLE_VALUE)
-                    PipeHandle = nullptr;
+
+                const std::chrono::steady_clock::time_point LateTime(std::chrono::steady_clock::now());
+                for(;;){
+                    PipeHandle = CreateFile(
+                        CurPath
+                        , GENERIC_WRITE
+                        , 0
+                        , nullptr
+                        , OPEN_EXISTING
+                        , 0
+                        , nullptr
+                        );
+                    if(PipeHandle == INVALID_HANDLE_VALUE)
+                        PipeHandle = nullptr;
+
+                    if(PipeHandle)
+                        break;
+
+                    const std::chrono::steady_clock::time_point CurrentTime(std::chrono::steady_clock::now());
+                    if(std::chrono::duration_cast<std::chrono::milliseconds>(CurrentTime - LateTime).count() > WaitTimeInMillisecond)
+                        break;
+                }
             }
             ~Client(){
                 {
