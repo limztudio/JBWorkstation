@@ -111,6 +111,26 @@ namespace JBF{
         }
 
         {
+            static constexpr D3D_SHADER_MODEL RequireShaderModel = D3D_SHADER_MODEL_6_5;
+            
+            D3D12_FEATURE_DATA_SHADER_MODEL ShaderModel = { RequireShaderModel };
+            if(FAILED(Device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &ShaderModel, sizeof(ShaderModel))) || (ShaderModel.HighestShaderModel < RequireShaderModel)){
+                PushError(Error::ErrorCode::GAPI_SHADER_MODEL_UNSUPPORTED, RequireShaderModel, ShaderModel.HighestShaderModel);
+                assert(false);
+                return false;
+            }
+        }
+
+        {
+            D3D12_FEATURE_DATA_D3D12_OPTIONS7 Features = {};
+            if(FAILED(Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS7, &Features, sizeof(Features))) || (Features.MeshShaderTier == D3D12_MESH_SHADER_TIER_NOT_SUPPORTED)){
+                PushError(Error::ErrorCode::GAPI_MESH_SHADER_UNSUPPORTED);
+                assert(false);
+                return false;
+            }
+        }
+
+        {
             D3D12_COMMAND_QUEUE_DESC DESC = {};
             DESC.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
             DESC.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;

@@ -85,6 +85,12 @@ namespace JBF{
                 return _T("GAPI warp adapter enumeration failed.");
             case ErrorCode::GAPI_DEVICE_CREATE_FAILED:
                 return _T("GAPI device creation failed.");
+
+            case ErrorCode::GAPI_SHADER_MODEL_UNSUPPORTED:
+                return Common::Format(_T("GAPI requires shader model: %x. But the hardware suports up to: %x"), std::forward<ARGS>(Args)...);
+            case ErrorCode::GAPI_MESH_SHADER_UNSUPPORTED:
+                return _T("GAPI requires mesh shader. But the hardware doesn't support it.");
+                
             case ErrorCode::GAPI_COMMAND_QUEUE_CREATE_FAILED:
                 return _T("GAPI command queue creation failed.");
             case ErrorCode::GAPI_SWAP_CHAIN_CREATE_FAILED:
