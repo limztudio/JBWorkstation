@@ -47,6 +47,24 @@ namespace JBF{
             FRAME_INIT_FAILED,
             FRAME_DESTROY_FAILED,
             FRAME_UPDATE_FAILED,
+
+            GAPI_FACTORY_CREATE_FAILED,
+            GAPI_WARP_ADAPTER_ENUM_FAILED,
+            GAPI_DEVICE_CREATE_FAILED,
+            GAPI_COMMAND_QUEUE_CREATE_FAILED,
+            GAPI_SWAP_CHAIN_CREATE_FAILED,
+            GAPI_SWAP_CHAIN_CONVERT_FAILED,
+            
+            GAPI_RTV_HEAP_CREATE_FAILED,
+            GAPI_DSV_HEAP_CREATE_FAILED,
+            GAPI_CBVSRVUAV_HEAP_CREATE_FAILED,
+
+            GAPI_SCENE_COMMAND_ALLOCATOR_CREATE_FAILED,
+        };
+        enum class WarningCode : unsigned long{
+            SUCCEEDED,
+
+            GAPI_EARN_DEBUG_INTERFACE_FAILED,
         };
     };
 };

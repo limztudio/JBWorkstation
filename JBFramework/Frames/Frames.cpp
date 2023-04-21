@@ -187,6 +187,9 @@ namespace JBF{
 
 
         bool WindowFrame::InitInternal(){
+            if(!GraphicsModule.Init(WindowHandle, false))
+                return false;
+            
             return true;
         }
         bool WindowFrame::DestroyInternal(){

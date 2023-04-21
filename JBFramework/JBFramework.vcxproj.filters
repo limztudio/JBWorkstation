@@ -64,6 +64,9 @@
     <Filter Include="Internal\EAAssert\source">
       <UniqueIdentifier>{916309ec-cb41-4cb4-8c9d-b03eb848b375}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Internal\GraphicsAPI">
+      <UniqueIdentifier>{800e5b21-74ac-4269-a3b2-91160546faef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Frames\Frames.cpp">
@@ -177,6 +180,12 @@
     <ClCompile Include="EAAssert\source\eaassert.cpp">
       <Filter>Internal\EAAssert\source</Filter>
     </ClCompile>
+    <ClCompile Include="GraphicsAPI\GraphicsAPICore.cpp">
+      <Filter>Internal\GraphicsAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsAPI\GraphicsAPI.cpp">
+      <Filter>Internal\GraphicsAPI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\JBFrameworkInclude\Frames\Frames.h">
@@ -247,6 +256,12 @@
     </ClInclude>
     <ClInclude Include="..\JBFrameworkInclude\Common\Container.h">
       <Filter>External\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsAPI\GraphicsAPI.h">
+      <Filter>Internal\GraphicsAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsAPI\GraphicsAPIMacro.hpp">
+      <Filter>Internal\GraphicsAPI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

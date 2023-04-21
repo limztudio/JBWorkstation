@@ -79,8 +79,44 @@ namespace JBF{
             case ErrorCode::FRAME_UPDATE_FAILED:
                 return _T("Frame update failed.");
 
+            case ErrorCode::GAPI_FACTORY_CREATE_FAILED:
+                return _T("GAPI factory creation failed.");
+            case ErrorCode::GAPI_WARP_ADAPTER_ENUM_FAILED:
+                return _T("GAPI warp adapter enumeration failed.");
+            case ErrorCode::GAPI_DEVICE_CREATE_FAILED:
+                return _T("GAPI device creation failed.");
+            case ErrorCode::GAPI_COMMAND_QUEUE_CREATE_FAILED:
+                return _T("GAPI command queue creation failed.");
+            case ErrorCode::GAPI_SWAP_CHAIN_CREATE_FAILED:
+                return _T("GAPI swap chain creation failed.");
+            case ErrorCode::GAPI_SWAP_CHAIN_CONVERT_FAILED:
+                return _T("GAPI swap chain conversion failed.");
+                
+            case ErrorCode::GAPI_RTV_HEAP_CREATE_FAILED:
+                return _T("GAPI RTV heap creation failed.");
+            case ErrorCode::GAPI_DSV_HEAP_CREATE_FAILED:
+                return _T("GAPI DSV heap creation failed.");
+            case ErrorCode::GAPI_CBVSRVUAV_HEAP_CREATE_FAILED:
+                return _T("GAPI CBV/SRV/UAV heap creation failed.");
+
+            case ErrorCode::GAPI_SCENE_COMMAND_ALLOCATOR_CREATE_FAILED:
+                return Common::Format(_T("GAPI creating scene command allocator at %x failed."), std::forward<ARGS>(Args)...);
+
             default:
                 return _T("Unknown error.");
+            }
+        }
+        template<typename... ARGS>
+        Common::String<TCHAR> GetWarningMessage(WarningCode Code, ARGS&&... Args){
+            switch(Code){
+            case WarningCode::SUCCEEDED:
+                return _T("Succeeded.");
+
+            case WarningCode::GAPI_EARN_DEBUG_INTERFACE_FAILED:
+                return _T("GAPI failed to earn debug interface.");
+
+            default:
+                return _T("Unknown warning.");
             }
         }
 

@@ -7,6 +7,7 @@
 
 #include <Error/Error.h>
 #include <../JBFramework/Error/ErrorPipe.h>
+#include <../JBFramework/GraphicsAPI/GraphicsAPI.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,6 +25,8 @@ namespace JBF{
 
     template<typename... ARGS>
     extern void PushError(Error::ErrorCode Code, ARGS&&... Args);
+    template<typename... ARGS>
+    extern void PushWarning(Error::WarningCode Code, ARGS&&... Args);
 
     
     namespace Frame{
@@ -75,6 +78,13 @@ namespace JBF{
             inline bool IsValid()const{ return WindowHandle != nullptr; }
             inline bool IsActive()const{ return bIsActive; }
 
+            inline void GetWindowSize(unsigned* Width, unsigned* Height)const{
+                RECT RC;
+                GetWindowRect(WindowHandle, &RC);
+                (*Width) = static_cast<unsigned>(RC.right - RC.left);
+                (*Height) = static_cast<unsigned>(RC.bottom - RC.top);
+            }
+
 
         public:
             bool Init();
@@ -93,6 +103,7 @@ namespace JBF{
             
         private:
             ErrorPipe::Client<TCHAR> ErrorPipeClient;
+            GraphicsAPI GraphicsModule;
 
         private:
             HWND WindowHandle;
@@ -111,6 +122,8 @@ namespace JBF{
 
             template<typename... ARGS>
             friend void JBF::PushError(Error::ErrorCode Code, ARGS&&... Args);
+            template<typename... ARGS>
+            friend void JBF::PushWarning(Error::WarningCode Code, ARGS&&... Args);
         };
     };
 
@@ -149,7 +162,11 @@ namespace JBF{
 
     template<typename... ARGS>
     inline void PushError(Error::ErrorCode Code, ARGS&&... Args){
-        MainFrame->ErrorPipeClient.PushMessage(Error::GetErrorMessage(Code, std::forward<ARGS>(Args)...));
+        MainFrame->ErrorPipeClient.PushMessage(_T("!Error! ") + Error::GetErrorMessage(Code, std::forward<ARGS>(Args)...));
+    }
+    template<typename... ARGS>
+    inline void PushWarning(Error::WarningCode Code, ARGS&&... Args){
+        MainFrame->ErrorPipeClient.PushMessage(_T("!Warning! ") + Error::GetWarningMessage(Code, std::forward<ARGS>(Args)...));
     }
 };
 

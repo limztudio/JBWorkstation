@@ -134,6 +134,8 @@
     <ClCompile Include="EASTL\source\thread_support.cpp" />
     <ClCompile Include="Error\Error.hpp" />
     <ClCompile Include="Frames\Frames.cpp" />
+    <ClCompile Include="GraphicsAPI\GraphicsAPI.cpp" />
+    <ClCompile Include="GraphicsAPI\GraphicsAPICore.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\JBFrameworkInclude\Common\Container.h" />
@@ -159,6 +161,8 @@
     <ClInclude Include="DirectXMath\Stereo3D\Stereo3DMatrixHelper.h" />
     <ClInclude Include="DirectXMath\XDSP\XDSP.h" />
     <ClInclude Include="Error\ErrorPipe.h" />
+    <ClInclude Include="GraphicsAPI\GraphicsAPI.h" />
+    <ClInclude Include="GraphicsAPI\GraphicsAPIMacro.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DirectXMath\Inc\DirectXCollision.inl" />
