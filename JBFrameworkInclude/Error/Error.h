@@ -63,7 +63,9 @@ namespace JBF{
             GAPI_DSV_HEAP_CREATE_FAILED,
             GAPI_CBVSRVUAV_HEAP_CREATE_FAILED,
 
+            GAPI_EARN_RT_BUFFER_FAILED,
             GAPI_SCENE_COMMAND_ALLOCATOR_CREATE_FAILED,
+            GAPI_CREATE_DS_BUFFER_FAILED,
         };
         enum class WarningCode : unsigned long{
             SUCCEEDED,

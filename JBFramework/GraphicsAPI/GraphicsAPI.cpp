@@ -8,7 +8,7 @@ namespace JBF{
     GraphicsAPI::GraphicsAPI()
         : FrameIndex(0)
         , RVTDescSize(0)
-        , CBVSRVUAVDescSize(0)
+        , DSVDescSize(0)
         , bUseVsync(false)
     {}
 

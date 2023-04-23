@@ -101,7 +101,7 @@ namespace JBF{
         }
         else{
             COM<IDXGIAdapter1> Adapter;
-            __hidden_GraphicsAPI::EnumHardwareAdapter(Factory.Get(), &Adapter);
+            __hidden_GraphicsAPI::EnumHardwareAdapter(Factory.Get(), &Adapter, true);
 
             if(FAILED(D3D12CreateDevice(Adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&Device)))){
                 PushError(Error::ErrorCode::GAPI_DEVICE_CREATE_FAILED);
@@ -143,10 +143,10 @@ namespace JBF{
             OBJECT_SET_NAME(CommandQueue);
         }
 
-        {
-            unsigned Width, Height;
-            MainFrame->GetWindowSize(&Width, &Height);
+        unsigned Width, Height;
+        MainFrame->GetWindowSize(&Width, &Height);
 
+        {
             HWND WinHandle = reinterpret_cast<HWND>(WindowHandle);
             
             DXGI_SWAP_CHAIN_DESC1 DESC = {};
@@ -180,7 +180,7 @@ namespace JBF{
 
         {
             D3D12_DESCRIPTOR_HEAP_DESC DESC = {};
-            DESC.NumDescriptors = FrameCount + 1;
+            DESC.NumDescriptors = FrameCount;
             DESC.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
             DESC.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
             
@@ -189,6 +189,8 @@ namespace JBF{
                 assert(false);
                 return false;
             }
+
+            RVTDescSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
         }
 
         {
@@ -202,31 +204,75 @@ namespace JBF{
                 assert(false);
                 return false;
             }
+
+            DSVDescSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
         }
 
         {
-            D3D12_DESCRIPTOR_HEAP_DESC DESC = {};
-            DESC.NumDescriptors = FrameCount * 3;
-            DESC.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-            DESC.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+            D3D12_CPU_DESCRIPTOR_HANDLE RTVHandle(RTVHeap->GetCPUDescriptorHandleForHeapStart());
             
-            if(FAILED(Device->CreateDescriptorHeap(&DESC, IID_PPV_ARGS(&CBVSRVUAVHeap)))){
-                PushError(Error::ErrorCode::GAPI_CBVSRVUAV_HEAP_CREATE_FAILED);
-                assert(false);
-                return false;
+            for(UINT i = 0; i < FrameCount; ++i){
+                if(FAILED(SwapChain->GetBuffer(i, IID_PPV_ARGS(&RTBuffers[i])))){
+                    PushError(Error::ErrorCode::GAPI_EARN_RT_BUFFER_FAILED, i);
+                    assert(false);
+                    return false;
+                }
+                OBJECT_SET_NAME_INDEX(RTBuffers[i], i);
+
+                Device->CreateRenderTargetView(RTBuffers[i].Get(), nullptr, RTVHandle);
+                RTVHandle.ptr += RVTDescSize;
+                
+                if(FAILED(Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&SceneCommandAllocators[i])))){
+                    PushError(Error::ErrorCode::GAPI_SCENE_COMMAND_ALLOCATOR_CREATE_FAILED, i);
+                    assert(false);
+                    return false;
+                }
             }
-            OBJECT_SET_NAME(CBVSRVUAVHeap);
         }
 
-        RVTDescSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-        CBVSRVUAVDescSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+        {
+            D3D12_DEPTH_STENCIL_VIEW_DESC ViewDesc = {};
+            ViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            ViewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+            ViewDesc.Flags = D3D12_DSV_FLAG_NONE;
 
-        for(UINT i = 0; i < FrameCount; ++i){
-            if(FAILED(Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&SceneCommandAllocators[i])))){
-                PushError(Error::ErrorCode::GAPI_SCENE_COMMAND_ALLOCATOR_CREATE_FAILED, i);
+            D3D12_CLEAR_VALUE ClearValue = {};
+            ClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+            ClearValue.DepthStencil.Depth = 1.0f;
+            ClearValue.DepthStencil.Stencil = 0;
+
+            D3D12_HEAP_PROPERTIES HeapProps = {};
+            HeapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+            HeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            HeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+            HeapProps.CreationNodeMask = 1;
+            HeapProps.VisibleNodeMask = 1;
+
+            D3D12_RESOURCE_DESC TextureDesc = {};
+            TextureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+            TextureDesc.Alignment = 0;
+            TextureDesc.Width = static_cast<decltype(TextureDesc.Width)>(Width);
+            TextureDesc.Height = static_cast<decltype(TextureDesc.Height)>(Height);
+            TextureDesc.DepthOrArraySize = 1;
+            TextureDesc.MipLevels = 0;
+            TextureDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            TextureDesc.SampleDesc.Count = 1;
+            TextureDesc.SampleDesc.Quality = 0;
+            TextureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+            TextureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+            
+            if(FAILED(Device->CreateCommittedResource(&HeapProps, D3D12_HEAP_FLAG_NONE, &TextureDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &ClearValue, IID_PPV_ARGS(&DSBuffer)))){
+                PushError(Error::ErrorCode::GAPI_CREATE_DS_BUFFER_FAILED);
                 assert(false);
                 return false;
             }
+            OBJECT_SET_NAME(DSBuffer);
+
+            Device->CreateDepthStencilView(DSBuffer.Get(), &ViewDesc, DSVHeap->GetCPUDescriptorHandleForHeapStart());
+        }
+
+        {
+            
         }
         
         return true;

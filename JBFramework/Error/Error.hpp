@@ -87,7 +87,7 @@ namespace JBF{
                 return _T("GAPI device creation failed.");
 
             case ErrorCode::GAPI_SHADER_MODEL_UNSUPPORTED:
-                return Common::Format(_T("GAPI requires shader model: %x. But the hardware suports up to: %x"), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("GAPI requires shader model: %u. But the hardware suports up to: %u"), std::forward<ARGS>(Args)...);
             case ErrorCode::GAPI_MESH_SHADER_UNSUPPORTED:
                 return _T("GAPI requires mesh shader. But the hardware doesn't support it.");
                 
@@ -105,8 +105,12 @@ namespace JBF{
             case ErrorCode::GAPI_CBVSRVUAV_HEAP_CREATE_FAILED:
                 return _T("GAPI CBV/SRV/UAV heap creation failed.");
 
+            case ErrorCode::GAPI_EARN_RT_BUFFER_FAILED:
+                return Common::Format(_T("GAPI earning render target buffer at %u from swap chain failed."), std::forward<ARGS>(Args)...);
             case ErrorCode::GAPI_SCENE_COMMAND_ALLOCATOR_CREATE_FAILED:
-                return Common::Format(_T("GAPI creating scene command allocator at %x failed."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("GAPI creating scene command allocator at %u failed."), std::forward<ARGS>(Args)...);
+            case ErrorCode::GAPI_CREATE_DS_BUFFER_FAILED:
+                return _T("GAPI creating depth-stencil buffer failed.");
 
             default:
                 return _T("Unknown error.");

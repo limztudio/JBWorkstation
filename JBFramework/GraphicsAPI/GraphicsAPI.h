@@ -40,18 +40,16 @@ namespace JBF{
         COM<IDXGISwapChain3> SwapChain;
         COM<ID3D12Device> Device;
         COM<ID3D12CommandQueue> CommandQueue;
-
+        COM<ID3D12Resource> RTBuffers[FrameCount];
+        COM<ID3D12Resource> DSBuffer;
+        COM<ID3D12CommandAllocator> SceneCommandAllocators[FrameCount];
         COM<ID3D12DescriptorHeap> RTVHeap;
         COM<ID3D12DescriptorHeap> DSVHeap;
-        COM<ID3D12DescriptorHeap> CBVSRVUAVHeap;
-
-    private:
-        COM<ID3D12CommandAllocator> SceneCommandAllocators[FrameCount];
 
     private:
         UINT FrameIndex;
         UINT RVTDescSize;
-        UINT CBVSRVUAVDescSize;
+        UINT DSVDescSize;
 
     private:
         bool bUseVsync;
