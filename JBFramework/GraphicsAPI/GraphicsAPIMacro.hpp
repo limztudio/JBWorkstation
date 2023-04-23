@@ -14,8 +14,8 @@
 #define OBJECT_SET_NAME(V) V->SetName(_T(#V))
 #define OBJECT_SET_NAME_INDEX(V, I) V->SetName(JBF::Common::Format(_T("%s_%u"), _T(#V), I).c_str())
 #else
-#define SET_NAME(V)
-#define SET_NAME_INDEX(V, I)
+#define OBJECT_SET_NAME(V)
+#define OBJECT_SET_NAME_INDEX(V, I)
 #endif
 
 
