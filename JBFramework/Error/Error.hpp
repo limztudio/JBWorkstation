@@ -109,8 +109,10 @@ namespace JBF{
                 return Common::Format(_T("GAPI earning render target buffer at %u from swap chain failed."), std::forward<ARGS>(Args)...);
             case ErrorCode::GAPI_SCENE_COMMAND_ALLOCATOR_CREATE_FAILED:
                 return Common::Format(_T("GAPI creating scene command allocator at {0:u} failed."), std::forward<ARGS>(Args)...);
-            case ErrorCode::GAPI_CREATE_DS_BUFFER_FAILED:
+            case ErrorCode::GAPI_DS_BUFFER_CREATE_FAILED:
                 return _T("GAPI creating depth-stencil buffer failed.");
+            case ErrorCode::GAPI_CS_BUFFER_CREATE_FAILED:
+                return _T("GAPI creating constant buffer failed.");
 
             default:
                 return _T("Unknown error.");

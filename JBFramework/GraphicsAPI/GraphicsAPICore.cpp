@@ -191,6 +191,7 @@ namespace JBF{
                 assert(false);
                 return false;
             }
+            OBJECT_SET_NAME(RTVHeap);
 
             RVTDescSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
         }
@@ -206,6 +207,7 @@ namespace JBF{
                 assert(false);
                 return false;
             }
+            OBJECT_SET_NAME(DSVHeap);
 
             DSVDescSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
         }
@@ -264,7 +266,7 @@ namespace JBF{
             TextureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
             
             if(FAILED(Device->CreateCommittedResource(&HeapProps, D3D12_HEAP_FLAG_NONE, &TextureDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &ClearValue, IID_PPV_ARGS(&DSBuffer)))){
-                PushError(Error::ErrorCode::GAPI_CREATE_DS_BUFFER_FAILED);
+                PushError(Error::ErrorCode::GAPI_DS_BUFFER_CREATE_FAILED);
                 assert(false);
                 return false;
             }
@@ -274,7 +276,31 @@ namespace JBF{
         }
 
         {
-            
+            D3D12_HEAP_PROPERTIES HeapProps = {};
+            HeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+            HeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            HeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+            HeapProps.CreationNodeMask = 1;
+            HeapProps.VisibleNodeMask = 1;
+
+            D3D12_RESOURCE_DESC BufferDesc = {};
+            BufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            BufferDesc.Alignment = 0;
+            BufferDesc.Width = Size * FrameCount;
+            BufferDesc.Height = 1;
+            BufferDesc.DepthOrArraySize = 1;
+            BufferDesc.MipLevels = 1;
+            BufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+            BufferDesc.SampleDesc.Count = 1;
+            BufferDesc.SampleDesc.Quality = 0;
+            BufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            BufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+                    
+            if(FAILED(Device->CreateCommittedResource(&HeapProps, D3D12_HEAP_FLAG_NONE, &BufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&CSBuffer)))){
+                PushError(Error::ErrorCode::GAPI_CS_BUFFER_CREATE_FAILED);
+                assert(false);
+                return false;
+            }
         }
         
         return true;
