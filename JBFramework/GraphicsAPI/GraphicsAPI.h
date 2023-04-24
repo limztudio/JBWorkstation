@@ -14,12 +14,12 @@
 
 
 namespace JBF{
-    class GraphicsAPI{
-    public:
+    namespace Graphics{
         template <typename T>
         using COM = Microsoft::WRL::ComPtr<T>;
-
-
+    };
+    
+    class GraphicsAPI{
     public:
         static constexpr UINT FrameCount = 2;
 
@@ -37,14 +37,14 @@ namespace JBF{
 
         
     private:
-        COM<IDXGISwapChain3> SwapChain;
-        COM<ID3D12Device> Device;
-        COM<ID3D12CommandQueue> CommandQueue;
-        COM<ID3D12Resource> RTBuffers[FrameCount];
-        COM<ID3D12Resource> DSBuffer;
-        COM<ID3D12CommandAllocator> SceneCommandAllocators[FrameCount];
-        COM<ID3D12DescriptorHeap> RTVHeap;
-        COM<ID3D12DescriptorHeap> DSVHeap;
+        Graphics::COM<IDXGISwapChain3> SwapChain;
+        Graphics::COM<ID3D12Device> Device;
+        Graphics::COM<ID3D12CommandQueue> CommandQueue;
+        Graphics::COM<ID3D12Resource> RTBuffers[FrameCount];
+        Graphics::COM<ID3D12Resource> DSBuffer;
+        Graphics::COM<ID3D12CommandAllocator> SceneCommandAllocators[FrameCount];
+        Graphics::COM<ID3D12DescriptorHeap> RTVHeap;
+        Graphics::COM<ID3D12DescriptorHeap> DSVHeap;
 
     private:
         UINT FrameIndex;

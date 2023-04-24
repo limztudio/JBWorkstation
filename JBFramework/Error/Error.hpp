@@ -31,27 +31,27 @@ namespace JBF{
                 return _T("ErrorPipe client writing message failed.");
                 
             case FatalCode::ERRORPIPE_SERVER_READ_MISMATCH:
-                return Common::Format(_T("ErrorPipe server reading message failed. Expected size: %ull, Actual size: %ull."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("ErrorPipe server reading message failed. Expected size: %ull, Actual size: {0:llu}."), std::forward<ARGS>(Args)...);
             case FatalCode::ERRORPIPE_CLIENT_WRITE_MISMATCH:
-                return Common::Format(_T("ErrorPipe client writing message failed. Expected size: %ull, Actual size: %ull."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("ErrorPipe client writing message failed. Expected size: %ull, Actual size: {0:llu}."), std::forward<ARGS>(Args)...);
 
             case FatalCode::LOGGER_CANNOT_EXECUTE:
                 return _T("Logger cannot be executed.");
             case FatalCode::LOGGER_NOT_VALID_AFTER_EXECUTED:
-                return Common::Format(_T("Logger is not valid after executed. Handle: %x."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("Logger is not valid after executed. Handle: {0#x}."), std::forward<ARGS>(Args)...);
                 
             case FatalCode::LOGGER_NO_PARENT:
                 return _T("Logger has no parent.");
             case FatalCode::LOGGER_CANNOT_LOOKUP_PARENT:
-                return Common::Format(_T("Logger couldn't look up parent process %x."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("Logger couldn't look up parent process {0#x}."), std::forward<ARGS>(Args)...);
 
             case FatalCode::LOGGER_NO_MODULE_DIRECTORY:
                 return _T("Logger couldn't find current module directory.");
             case FatalCode::LOGGER_CANNOT_OPEN_LOG_FILE:
-                return Common::Format(_T("Logger couldn't open log file \"%s\"."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("Logger couldn't open log file \"{0:s}\"."), std::forward<ARGS>(Args)...);
 
             case FatalCode::LOGGER_WRITE_MISMATCH:
-                return Common::Format(_T("Logger couldn't write to log file. Expected size: %ull, Actual size: %ull."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("Logger couldn't write to log file. Expected size: {0:llu}, Actual size: {1:llu}."), std::forward<ARGS>(Args)...);
 
             default:
                 return _T("Unknown fatal error.");
@@ -70,7 +70,7 @@ namespace JBF{
             case ErrorCode::FRAME_WINDOW_ADJUST_FAILED:
                 return _T("Frame window adjustment failed.");
             case ErrorCode::FRAME_WINDOW_MOVE_FAILED:
-                return Common::Format(_T("Frame window moving failed. HWND: %x"), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("Frame window moving failed. HWND: {0#x}"), std::forward<ARGS>(Args)...);
 
             case ErrorCode::FRAME_INIT_FAILED:
                 return _T("Frame initialization failed.");
@@ -87,7 +87,7 @@ namespace JBF{
                 return _T("GAPI device creation failed.");
 
             case ErrorCode::GAPI_SHADER_MODEL_UNSUPPORTED:
-                return Common::Format(_T("GAPI requires shader model: %u. But the hardware suports up to: %u"), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("GAPI requires shader model: {0:u}. But the hardware suports up to: {1:u}"), std::forward<ARGS>(Args)...);
             case ErrorCode::GAPI_MESH_SHADER_UNSUPPORTED:
                 return _T("GAPI requires mesh shader. But the hardware doesn't support it.");
                 
@@ -108,7 +108,7 @@ namespace JBF{
             case ErrorCode::GAPI_EARN_RT_BUFFER_FAILED:
                 return Common::Format(_T("GAPI earning render target buffer at %u from swap chain failed."), std::forward<ARGS>(Args)...);
             case ErrorCode::GAPI_SCENE_COMMAND_ALLOCATOR_CREATE_FAILED:
-                return Common::Format(_T("GAPI creating scene command allocator at %u failed."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("GAPI creating scene command allocator at {0:u} failed."), std::forward<ARGS>(Args)...);
             case ErrorCode::GAPI_CREATE_DS_BUFFER_FAILED:
                 return _T("GAPI creating depth-stencil buffer failed.");
 
