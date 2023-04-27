@@ -318,6 +318,12 @@ namespace JBF{
         
         return true;
     }
+
+    bool GraphicsAPI::ReadAssets(){
+
+        
+        return true;
+    }
 };
 
 

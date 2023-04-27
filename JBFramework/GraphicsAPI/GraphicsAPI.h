@@ -50,6 +50,7 @@ namespace JBF{
         
     private:
         bool InitPipeline(void* WindowHandle, bool bUseWarp);
+        bool ReadAssets();
 
         
     private:

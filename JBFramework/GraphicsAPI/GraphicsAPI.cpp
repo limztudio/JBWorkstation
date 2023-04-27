@@ -17,6 +17,9 @@ namespace JBF{
     bool GraphicsAPI::Init(void* WindowHandle, bool bUseWarp){
         if(!InitPipeline(WindowHandle, bUseWarp))
             return false;
+
+        if(!ReadAssets())
+            return false;
         
         return true;
     }
