@@ -31,9 +31,9 @@ namespace JBF{
                 return _T("ErrorPipe client writing message failed.");
                 
             case FatalCode::ERRORPIPE_SERVER_READ_MISMATCH:
-                return Common::Format(_T("ErrorPipe server reading message failed. Expected size: %ull, Actual size: {0:llu}."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("ErrorPipe server reading message failed. Expected size: {0:llu}, Actual size: {1:llu}."), std::forward<ARGS>(Args)...);
             case FatalCode::ERRORPIPE_CLIENT_WRITE_MISMATCH:
-                return Common::Format(_T("ErrorPipe client writing message failed. Expected size: %ull, Actual size: {0:llu}."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("ErrorPipe client writing message failed. Expected size: {0:llu}, Actual size: {1:llu}."), std::forward<ARGS>(Args)...);
 
             case FatalCode::LOGGER_CANNOT_EXECUTE:
                 return _T("Logger cannot be executed.");
@@ -106,7 +106,7 @@ namespace JBF{
                 return _T("GAPI CBV/SRV/UAV heap creation failed.");
 
             case ErrorCode::GAPI_EARN_RT_BUFFER_FAILED:
-                return Common::Format(_T("GAPI earning render target buffer at %u from swap chain failed."), std::forward<ARGS>(Args)...);
+                return Common::Format(_T("GAPI earning render target buffer at {0:u} from swap chain failed."), std::forward<ARGS>(Args)...);
             case ErrorCode::GAPI_SCENE_COMMAND_ALLOCATOR_CREATE_FAILED:
                 return Common::Format(_T("GAPI creating scene command allocator at {0:u} failed."), std::forward<ARGS>(Args)...);
             case ErrorCode::GAPI_DS_BUFFER_CREATE_FAILED:
