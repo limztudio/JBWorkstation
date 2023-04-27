@@ -276,6 +276,8 @@ namespace JBF{
         }
 
         {
+            constexpr UINT64 Size = sizeof(Graphics::ConstantBuffer) * FrameCount;
+            
             D3D12_HEAP_PROPERTIES HeapProps = {};
             HeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
             HeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -298,6 +300,17 @@ namespace JBF{
                     
             if(FAILED(Device->CreateCommittedResource(&HeapProps, D3D12_HEAP_FLAG_NONE, &BufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&CSBuffer)))){
                 PushError(Error::ErrorCode::GAPI_CS_BUFFER_CREATE_FAILED);
+                assert(false);
+                return false;
+            }
+
+            D3D12_CONSTANT_BUFFER_VIEW_DESC ViewDesc = {};
+            ViewDesc.BufferLocation = CSBuffer->GetGPUVirtualAddress();
+            ViewDesc.SizeInBytes = Size;
+
+            D3D12_RANGE ReadRange = { 0, 0 };
+            if(FAILED(CSBuffer->Map(0, &ReadRange, reinterpret_cast<void**>(&CSBufferView)))){
+                PushError(Error::ErrorCode::GAPI_CS_BUFFER_MAP_FAILED);
                 assert(false);
                 return false;
             }

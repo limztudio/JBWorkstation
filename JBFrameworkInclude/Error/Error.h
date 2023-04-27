@@ -67,6 +67,8 @@ namespace JBF{
             GAPI_SCENE_COMMAND_ALLOCATOR_CREATE_FAILED,
             GAPI_DS_BUFFER_CREATE_FAILED,
             GAPI_CS_BUFFER_CREATE_FAILED,
+            
+            GAPI_CS_BUFFER_MAP_FAILED,
         };
         enum class WarningCode : unsigned long{
             SUCCEEDED,

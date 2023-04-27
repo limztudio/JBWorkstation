@@ -66,6 +66,7 @@ namespace JBF{
 
     private:
         Graphics::COM<ID3D12Resource> CSBuffer;
+        UINT8* CSBufferView;
 
     private:
         UINT FrameIndex;

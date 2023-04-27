@@ -114,6 +114,9 @@ namespace JBF{
             case ErrorCode::GAPI_CS_BUFFER_CREATE_FAILED:
                 return _T("GAPI creating constant buffer failed.");
 
+            case ErrorCode::GAPI_CS_BUFFER_MAP_FAILED:
+                return _T("GAPI mapping constant buffer failed.");
+
             default:
                 return _T("Unknown error.");
             }

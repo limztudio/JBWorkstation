@@ -9,6 +9,7 @@ namespace JBF{
         : FrameIndex(0)
         , RVTDescSize(0)
         , DSVDescSize(0)
+        , CSBufferView(nullptr)
         , bUseVsync(false)
     {}
 
