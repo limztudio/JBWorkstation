@@ -26,14 +26,14 @@ static inline DWORD GetParentProcessId(){
     DWORD PID = GetCurrentProcessId();
 
     HANDLE SnapshotHandle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    __try{
+    do{
         if(SnapshotHandle == INVALID_HANDLE_VALUE)
-            __leave;
+            break;
 
         PROCESSENTRY32 PE32 = {};
         PE32.dwSize = sizeof(PE32);
         if(!Process32First(SnapshotHandle, &PE32))
-            __leave;
+            break;
 
         do{
             if(PE32.th32ProcessID == PID){
@@ -42,12 +42,12 @@ static inline DWORD GetParentProcessId(){
             }
         }
         while(Process32Next(SnapshotHandle, &PE32));
+    }
+    while(false);
 
-    }
-    __finally{
-        if(SnapshotHandle != INVALID_HANDLE_VALUE)
-            CloseHandle(SnapshotHandle);
-    }
+    if(SnapshotHandle != INVALID_HANDLE_VALUE)
+        CloseHandle(SnapshotHandle);
+    
     return PPID;
 }
 
