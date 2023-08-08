@@ -21,61 +21,61 @@
 
 namespace JBF{
     namespace ErrorPipe{
-        static constexpr TCHAR PipePath[] = _T("\\\\.\\pipe\\jbf_pipe");
-        static constexpr size_t PipeBufferSize = 1024;
+        static constexpr TCHAR pipePath[] = _T("\\\\.\\pipe\\jbf_pipe");
+        static constexpr size_t pipeBufferSize = 1024;
 
 
         template<typename CHARTYPE = TCHAR>
         class Server{
         public:
-            Server(unsigned long ID)
-                : PipeHandle(nullptr)
+            Server(unsigned long id)
+                : pipeHandle(nullptr)
                 , bConnected(false)
             {
-                TCHAR CurPath[std::size(PipePath) + 128] = { 0 };
-                memcpy_s(CurPath, sizeof(CurPath), PipePath, sizeof(PipePath));
+                TCHAR curPath[std::size(pipePath) + 128] = { 0 };
+                memcpy_s(curPath, sizeof(curPath), pipePath, sizeof(pipePath));
 
-                const Common::String MainHandleStr = Common::ToString(ID);
-                memcpy_s(CurPath + std::size(PipePath) - 1, (std::size(CurPath) - std::size(PipePath) + 1) * sizeof(TCHAR), MainHandleStr.c_str(), MainHandleStr.length() * sizeof(TCHAR));
+                const Common::String mainHandleStr = Common::ToString(id);
+                memcpy_s(curPath + std::size(pipePath) - 1, (std::size(curPath) - std::size(pipePath) + 1) * sizeof(TCHAR), mainHandleStr.c_str(), mainHandleStr.length() * sizeof(TCHAR));
                 
-                PipeHandle = CreateNamedPipe(
-                    CurPath
+                pipeHandle = CreateNamedPipe(
+                    curPath
                     , PIPE_ACCESS_INBOUND
                     , PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
                     , 1
-                    , (PipeBufferSize * sizeof(CHARTYPE)) + 1
-                    , (PipeBufferSize * sizeof(CHARTYPE)) + 1
+                    , (pipeBufferSize * sizeof(CHARTYPE)) + 1
+                    , (pipeBufferSize * sizeof(CHARTYPE)) + 1
                     , 0
                     , nullptr
                     );
-                if(PipeHandle == INVALID_HANDLE_VALUE)
-                    PipeHandle = nullptr;
+                if(pipeHandle == INVALID_HANDLE_VALUE)
+                    pipeHandle = nullptr;
 
-                if(!PipeHandle)
+                if(!pipeHandle)
                     return;
             }
             ~Server(){
-                if(PipeHandle){
+                if(pipeHandle){
                     if(bConnected){
-                        DisconnectNamedPipe(PipeHandle);
+                        DisconnectNamedPipe(pipeHandle);
                         bConnected = false;
                     }
                     
-                    CloseHandle(PipeHandle);
+                    CloseHandle(pipeHandle);
                 }
             }
 
 
         public:
-            inline bool IsValid()const{ return (PipeHandle != nullptr); }
+            inline bool IsValid()const{ return (pipeHandle != nullptr); }
 
         public:
             bool WaitUntilConnected(){
                 for(;;){
-                    if(ConnectNamedPipe(PipeHandle, nullptr))
+                    if(ConnectNamedPipe(pipeHandle, nullptr))
                         break;
                     if(GetLastError() == ERROR_PIPE_CONNECTED){
-                        PipeHandle = nullptr;
+                        pipeHandle = nullptr;
                         return false;
                     }
                 }
@@ -83,75 +83,75 @@ namespace JBF{
                 return true;
             }
             
-            bool Read(Common::String<CHARTYPE>& Result){
-                Result.clear();
+            bool Read(Common::String<CHARTYPE>& result){
+                result.clear();
                 
                 if(!bConnected)
                     return false;
                 
-                unsigned char RawBuffer[(PipeBufferSize * sizeof(CHARTYPE)) + 1] = { 0 };
-                CHARTYPE* Buffer = reinterpret_cast<CHARTYPE*>(RawBuffer + 1);
+                unsigned char rawBuffer[(pipeBufferSize * sizeof(CHARTYPE)) + 1] = { 0 };
+                CHARTYPE* buffer = reinterpret_cast<CHARTYPE*>(rawBuffer + 1);
 
-                DWORD BytesRead = 0;
-                if(!PeekNamedPipe(PipeHandle, nullptr, 0, nullptr, &BytesRead, nullptr))
+                DWORD bytesRead = 0;
+                if(!PeekNamedPipe(pipeHandle, nullptr, 0, nullptr, &bytesRead, nullptr))
                     return false;
-                if(BytesRead < sizeof(RawBuffer))
+                if(bytesRead < sizeof(rawBuffer))
                     return false;
 
                 for(;;){
-                    BytesRead = 0;
+                    bytesRead = 0;
                     if(!ReadFile(
-                        PipeHandle
-                        , RawBuffer
-                        , sizeof(RawBuffer)
-                        , &BytesRead,
+                        pipeHandle
+                        , rawBuffer
+                        , sizeof(rawBuffer)
+                        , &bytesRead,
                         nullptr
                         ))
                         break;
 
-                    if(BytesRead != sizeof(RawBuffer)){
-                        Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_SERVER_READ_MISMATCH, sizeof(RawBuffer), BytesRead);
+                    if(bytesRead != sizeof(rawBuffer)){
+                        Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_SERVER_READ_MISMATCH, sizeof(rawBuffer), bytesRead);
                         assert(false);
                         return false;
                     }
 
-                    if((*RawBuffer) == 0xff){
-                        Result += Buffer;
+                    if((*rawBuffer) == 0xff){
+                        result += buffer;
                         break;
                     }
-                    else if((*RawBuffer) == 0x00){
-                        Result.resize(Result.size() + PipeBufferSize);
-                        memcpy_s(Result.data() + (Result.size() - PipeBufferSize), PipeBufferSize, Buffer, PipeBufferSize);
+                    else if((*rawBuffer) == 0x00){
+                        result.resize(result.size() + pipeBufferSize);
+                        memcpy_s(result.data() + (result.size() - pipeBufferSize), pipeBufferSize, buffer, pipeBufferSize);
                     }
                 }
 
-                return !Result.empty();
+                return !result.empty();
             }
 
             
         private:
-            HANDLE PipeHandle;
+            HANDLE pipeHandle;
             bool bConnected;
         };
 
         template<typename CHARTYPE = TCHAR>
         class Client{
         public:
-            Client(unsigned long ID, unsigned long WaitTimeInMillisecond)
-                : Thread(ThreadWork, this)
+            Client(unsigned long id, unsigned long waitTimeInMillisecond)
+                : thread(ThreadWork, this)
                 , bExit(false)
-                , PipeHandle(nullptr)
+                , pipeHandle(nullptr)
             {
-                TCHAR CurPath[std::size(PipePath) + 128] = { 0 };
-                memcpy_s(CurPath, sizeof(CurPath), PipePath, sizeof(PipePath));
+                TCHAR curPath[std::size(pipePath) + 128] = { 0 };
+                memcpy_s(curPath, sizeof(curPath), pipePath, sizeof(pipePath));
 
-                const Common::String MainHandleStr = Common::ToString(ID);
-                memcpy_s(CurPath + std::size(PipePath) - 1, (std::size(CurPath) - std::size(PipePath) + 1) * sizeof(TCHAR), MainHandleStr.c_str(), MainHandleStr.length() * sizeof(TCHAR));
+                const Common::String mainHandleStr = Common::ToString(id);
+                memcpy_s(curPath + std::size(pipePath) - 1, (std::size(curPath) - std::size(pipePath) + 1) * sizeof(TCHAR), mainHandleStr.c_str(), mainHandleStr.length() * sizeof(TCHAR));
 
-                const std::chrono::steady_clock::time_point LateTime(std::chrono::steady_clock::now());
+                const std::chrono::steady_clock::time_point lateTime(std::chrono::steady_clock::now());
                 for(;;){
-                    PipeHandle = CreateFile(
-                        CurPath
+                    pipeHandle = CreateFile(
+                        curPath
                         , GENERIC_WRITE
                         , 0
                         , nullptr
@@ -159,94 +159,94 @@ namespace JBF{
                         , 0
                         , nullptr
                         );
-                    if(PipeHandle == INVALID_HANDLE_VALUE)
-                        PipeHandle = nullptr;
+                    if(pipeHandle == INVALID_HANDLE_VALUE)
+                        pipeHandle = nullptr;
 
-                    if(PipeHandle)
+                    if(pipeHandle)
                         break;
 
-                    const std::chrono::steady_clock::time_point CurrentTime(std::chrono::steady_clock::now());
-                    if(std::chrono::duration_cast<std::chrono::milliseconds>(CurrentTime - LateTime).count() > WaitTimeInMillisecond)
+                    const std::chrono::steady_clock::time_point currentTime(std::chrono::steady_clock::now());
+                    if(std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lateTime).count() > waitTimeInMillisecond)
                         break;
                 }
             }
             ~Client(){
                 {
-                    std::unique_lock Lock(Mutex);
+                    std::unique_lock lock(mutex);
                     bExit = true;
                 }
-                Switch.notify_one();
+                conVal.notify_one();
                 
-                Thread.join();
+                thread.join();
                 
-                if(PipeHandle)
-                    CloseHandle(PipeHandle);
+                if(pipeHandle)
+                    CloseHandle(pipeHandle);
             }
 
 
         public:
-            inline bool IsValid()const{ return (PipeHandle != nullptr); }
+            inline bool IsValid()const{ return (pipeHandle != nullptr); }
 
         public:
-            void PushMessage(const Common::String<CHARTYPE>& Message){
+            void PushMessage(const Common::String<CHARTYPE>& message){
                 {
-                    std::unique_lock Lock(Mutex);
-                    MessageQueue.emplace_back(Message);
+                    std::unique_lock lock(mutex);
+                    messageQueue.emplace_back(message);
                 }
-                Switch.notify_one();
+                conVal.notify_one();
             }
-            void PushMessage(Common::String<CHARTYPE>&& Message){
+            void PushMessage(Common::String<CHARTYPE>&& message){
                 {
-                    std::unique_lock Lock(Mutex);
-                    MessageQueue.emplace(std::move(Message));
+                    std::unique_lock lock(mutex);
+                    messageQueue.emplace(std::move(message));
                 }
-                Switch.notify_one();
+                conVal.notify_one();
             }
 
 
         private:
-            static void ThreadWork(Client* This){
+            static void ThreadWork(Client* _this){
                 for(;;){
-                    std::unique_lock Lock(This->Mutex);
-                    This->Switch.wait(Lock, [This]{
-                        return (This->bExit || (!This->MessageQueue.empty()));
+                    std::unique_lock lock(_this->mutex);
+                    _this->conVal.wait(lock, [_this]{
+                        return (_this->bExit || (!_this->messageQueue.empty()));
                     });
 
-                    while(!This->MessageQueue.empty()){
-                        This->Write(This->MessageQueue.front());
-                        This->MessageQueue.pop();
+                    while(!_this->messageQueue.empty()){
+                        _this->Write(_this->messageQueue.front());
+                        _this->messageQueue.pop();
                     }
 
-                    if(This->bExit)
+                    if(_this->bExit)
                         break;
                 }
             }
 
             
         private:
-            void Write(const Common::String<CHARTYPE>& Message){
-                unsigned char RawBuffer[(PipeBufferSize * sizeof(CHARTYPE)) + 1] = { 0 };
-                CHARTYPE* Buffer = reinterpret_cast<CHARTYPE*>(RawBuffer + 1);
+            void Write(const Common::String<CHARTYPE>& message){
+                unsigned char rawBuffer[(pipeBufferSize * sizeof(CHARTYPE)) + 1] = { 0 };
+                CHARTYPE* buffer = reinterpret_cast<CHARTYPE*>(rawBuffer + 1);
                 
-                const size_t StringLen = Message.length();
+                const size_t stringLen = message.length();
 
-                for(size_t Cur = 0;;){
-                    const size_t Next = Cur + PipeBufferSize;
-                    if(Next >= StringLen){
-                        (*RawBuffer) = 0xff;
+                for(size_t cur = 0;;){
+                    const size_t next = cur + pipeBufferSize;
+                    if(next >= stringLen){
+                        (*rawBuffer) = 0xff;
 
-                        const size_t StrLen = StringLen - Cur;
-                        memcpy_s(Buffer, PipeBufferSize * sizeof(CHARTYPE), Message.c_str() + Cur, StrLen * sizeof(CHARTYPE));
+                        const size_t strLen = stringLen - cur;
+                        memcpy_s(buffer, pipeBufferSize * sizeof(CHARTYPE), message.c_str() + cur, strLen * sizeof(CHARTYPE));
 
-                        static constexpr CHARTYPE NullBuffer[PipeBufferSize] = { 0 };
-                        memcpy_s(Buffer + StrLen, (PipeBufferSize - StrLen) * sizeof(CHARTYPE), NullBuffer, (PipeBufferSize - StrLen) * sizeof(CHARTYPE));
+                        static constexpr CHARTYPE nullBuffer[pipeBufferSize] = { 0 };
+                        memcpy_s(buffer + strLen, (pipeBufferSize - strLen) * sizeof(CHARTYPE), nullBuffer, (pipeBufferSize - strLen) * sizeof(CHARTYPE));
                         
-                        DWORD BytesWritten = 0;
+                        DWORD bytesWritten = 0;
                         if(!WriteFile(
-                            PipeHandle
-                            , &RawBuffer
-                            , sizeof(RawBuffer)
-                            , &BytesWritten
+                            pipeHandle
+                            , &rawBuffer
+                            , sizeof(rawBuffer)
+                            , &bytesWritten
                             , nullptr
                             ))
                         {
@@ -254,8 +254,8 @@ namespace JBF{
                             assert(false);
                             return;
                         }
-                        if(BytesWritten != sizeof(RawBuffer)){
-                            Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_CLIENT_WRITE_MISMATCH, sizeof(RawBuffer), BytesWritten);
+                        if(bytesWritten != sizeof(rawBuffer)){
+                            Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_CLIENT_WRITE_MISMATCH, sizeof(rawBuffer), bytesWritten);
                             assert(false);
                             return;
                         }
@@ -263,16 +263,16 @@ namespace JBF{
                         break;
                     }
                     else{
-                        (*RawBuffer) = 0x00;
+                        (*rawBuffer) = 0x00;
 
-                        memcpy_s(Buffer, PipeBufferSize * sizeof(CHARTYPE), Message.c_str() + Cur, PipeBufferSize * sizeof(CHARTYPE));
+                        memcpy_s(buffer, pipeBufferSize * sizeof(CHARTYPE), message.c_str() + cur, pipeBufferSize * sizeof(CHARTYPE));
                         
-                        DWORD BytesWritten = 0;
+                        DWORD bytesWritten = 0;
                         if(!WriteFile(
-                            PipeHandle
-                            , &RawBuffer
-                            , sizeof(RawBuffer)
-                            , &BytesWritten
+                            pipeHandle
+                            , &rawBuffer
+                            , sizeof(rawBuffer)
+                            , &bytesWritten
                             , nullptr
                             ))
                         {
@@ -280,28 +280,28 @@ namespace JBF{
                             assert(false);
                             return;
                         }
-                        if(BytesWritten != sizeof(RawBuffer)){
-                            Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_CLIENT_WRITE_MISMATCH, sizeof(RawBuffer), BytesWritten);
+                        if(bytesWritten != sizeof(rawBuffer)){
+                            Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_CLIENT_WRITE_MISMATCH, sizeof(rawBuffer), bytesWritten);
                             assert(false);
                             return;
                         }
                         
-                        Cur = Next;
+                        cur = next;
                     }
                 }
             }
 
 
         private:
-            std::thread Thread;
-            std::mutex Mutex;
-            std::condition_variable Switch;
+            std::thread thread;
+            std::mutex mutex;
+            std::condition_variable conVal;
             bool bExit;
             
-            Common::Queue<Common::String<CHARTYPE>> MessageQueue;
+            Common::Queue<Common::String<CHARTYPE>> messageQueue;
             
         private:
-            HANDLE PipeHandle;
+            HANDLE pipeHandle;
         };
     };
 };

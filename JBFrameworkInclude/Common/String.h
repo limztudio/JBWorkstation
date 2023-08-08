@@ -21,24 +21,24 @@ namespace JBF{
         
         namespace __hidden{
             template<typename T>
-            inline String<char> ToString(char, T V){ return eastl::to_string(V); }
+            inline String<char> ToString(char, T v){ return eastl::to_string(v); }
             template<typename T>
-            inline String<wchar_t> ToString(wchar_t, T V){ return eastl::to_wstring(V); }            
+            inline String<wchar_t> ToString(wchar_t, T v){ return eastl::to_wstring(v); }            
         };
         template<typename V, typename T = TCHAR>
-        inline String<T> ToString(V Value){ return __hidden::ToString(T(), Value); }
+        inline String<T> ToString(V value){ return __hidden::ToString(T(), value); }
 
         template<typename T = TCHAR, typename... ARGS>
-        inline String<T> Format(const T* Text, ARGS&&... Args){
-            String<T> Result;
-            Result.sprintf(Text, std::forward<ARGS>(Args)...);
-            return std::move(Result);
+        inline String<T> Format(const T* text, ARGS&&... args){
+            String<T> result;
+            result.sprintf(text, std::forward<ARGS>(args)...);
+            return result;
         }
         template<typename T = TCHAR, typename... ARGS>
-        inline String<T> Format(const StringView<T>& Text, ARGS&&... Args){
-            String<T> Result;
-            Result.sprintf(Text.data(), std::forward<ARGS>(Args)...);
-            return std::move(Result);
+        inline String<T> Format(const StringView<T>& text, ARGS&&... args){
+            String<T> result;
+            result.sprintf(text.data(), std::forward<ARGS>(args)...);
+            return result;
         }
     };
 };

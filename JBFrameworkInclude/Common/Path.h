@@ -29,80 +29,80 @@ namespace JBF{
             Path& operator=(Path&&)noexcept = default;
 
         private:
-            Path(const std::filesystem::path& Rhs) : Actual(Rhs){}
-            Path(std::filesystem::path&& Rhs)noexcept : Actual(std::move(Rhs)){}
+            Path(const std::filesystem::path& rhs) : actual(rhs){}
+            Path(std::filesystem::path&& rhs)noexcept : actual(std::move(rhs)){}
         public:
-            Path(const T* String) : Actual(String){}
-            Path(const StringType& String) : Actual(String.c_str()){}
-            Path(StringType&& String)noexcept : Actual(String.c_str()){ String.clear(); }
-            Path(const StringViewType& String) : Actual(String.data()){}
-            Path(StringViewType&& String)noexcept : Actual(String.data()){}
+            Path(const T* string) : actual(string){}
+            Path(const StringType& string) : actual(string.c_str()){}
+            Path(StringType&& string)noexcept : actual(string.c_str()){ string.clear(); }
+            Path(const StringViewType& string) : actual(string.data()){}
+            Path(StringViewType&& string)noexcept : actual(string.data()){}
 
         public:
-            Path& operator/=(const Path& Rhs){
-                Actual /= Rhs.Actual;
+            Path& operator/=(const Path& rhs){
+                actual /= rhs.actual;
                 return *this;
             }
-            Path& operator+=(const Path& Rhs){
-                Actual += Rhs.Actual;
+            Path& operator+=(const Path& rhs){
+                actual += rhs.actual;
                 return *this;
             }
 
         public:
-            StringType String()const{ return StringType(Actual.string<T>().c_str()); }
-            operator StringType()const{ return StringType(Actual.string<T>().c_str()); }
+            StringType String()const{ return StringType(actual.string<T>().c_str()); }
+            operator StringType()const{ return StringType(actual.string<T>().c_str()); }
 
 
         public:
-            bool Empty()const noexcept{ return Actual.empty(); }
-            void Clear()noexcept{ Actual.clear(); }
+            bool Empty()const noexcept{ return actual.empty(); }
+            void Clear()noexcept{ actual.clear(); }
 
         public:
-            Path Parent()const noexcept{ return Path(Actual.parent_path()); }
-            Path Filename()const noexcept{ return Path(Actual.filename()); }
-            Path Stem()const noexcept{ return Path(Actual.stem()); }
-            Path Extension()const noexcept{ return Path(Actual.extension()); }
+            Path Parent()const noexcept{ return Path(actual.parent_path()); }
+            Path Filename()const noexcept{ return Path(actual.filename()); }
+            Path Stem()const noexcept{ return Path(actual.stem()); }
+            Path Extension()const noexcept{ return Path(actual.extension()); }
             Path Absolute()const noexcept{
-                std::error_code ErrorCode;
-                const std::filesystem::path Result = std::filesystem::canonical(Actual, ErrorCode);
-                return ErrorCode ? Path() : Path(std::move(Result));
+                std::error_code errorCode;
+                const std::filesystem::path result = std::filesystem::canonical(actual, errorCode);
+                return errorCode ? Path() : Path(result);
             }
 
             
         private:
-            std::filesystem::path Actual;
+            std::filesystem::path actual;
 
 
         public:
             template<typename K>
-            friend bool operator==(const Path<K>& Lhs, const Path<K>& Rhs)noexcept;
+            friend bool operator==(const Path<K>& lhs, const Path<K>& rhs)noexcept;
             template<typename K>
-            friend bool operator!=(const Path<K>& Lhs, const Path<K>& Rhs)noexcept;
+            friend bool operator!=(const Path<K>& lhs, const Path<K>& rhs)noexcept;
         };
 
         template<typename T>
-        inline Path<T> operator/(const Path<T>& Lhs, const Path<T>& Rhs){
-            Path<T> Result(Lhs);
-            Result /= Rhs;
-            return Result;
+        inline Path<T> operator/(const Path<T>& lhs, const Path<T>& rhs){
+            Path<T> result(lhs);
+            result /= rhs;
+            return result;
         }
         template<typename T>
-        inline Path<T> operator+(const Path<T>& Lhs, const Path<T>& Rhs){
-            Path<T> Result(Lhs);
-            Result += Rhs;
-            return Result;
+        inline Path<T> operator+(const Path<T>& lhs, const Path<T>& rhs){
+            Path<T> result(lhs);
+            result += rhs;
+            return result;
         }
         template<typename T>
-        inline bool operator==(const Path<T>& Lhs, const Path<T>& Rhs)noexcept{
-            std::error_code ErrorCode;
-            const bool bRet = std::filesystem::equivalent(Lhs.Actual, Rhs.Actual, ErrorCode);
-            return ErrorCode ? false : bRet;
+        inline bool operator==(const Path<T>& lhs, const Path<T>& rhs)noexcept{
+            std::error_code errorCode;
+            const bool bRet = std::filesystem::equivalent(lhs.actual, rhs.actual, errorCode);
+            return errorCode ? false : bRet;
         }
         template<typename T>
-        inline bool operator!=(const Path<T>& Lhs, const Path<T>& Rhs)noexcept{
-            std::error_code ErrorCode;
-            const bool bRet = std::filesystem::equivalent(Lhs.Actual, Rhs.Actual, ErrorCode);
-            return ErrorCode ? false : !bRet;
+        inline bool operator!=(const Path<T>& lhs, const Path<T>& rhs)noexcept{
+            std::error_code errorCode;
+            const bool bRet = std::filesystem::equivalent(lhs.actual, rhs.actual, errorCode);
+            return errorCode ? false : !bRet;
         }
         
         extern Path<TCHAR> GetModuleDirectory();

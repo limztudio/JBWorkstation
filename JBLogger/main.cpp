@@ -14,41 +14,39 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-static constexpr size_t BufferCount = 512;
-static constexpr TCHAR LogFileName[] = _T("CurrentLog.log");
+static constexpr size_t bufferCount = 512;
+static constexpr TCHAR logFileName[] = _T("CurrentLog.log");
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 static inline DWORD GetParentProcessId(){
-    DWORD PPID = 0;
-    DWORD PID = GetCurrentProcessId();
+    DWORD ppid = 0;
+    DWORD pid = GetCurrentProcessId();
 
-    HANDLE SnapshotHandle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    __try{
-        if(SnapshotHandle == INVALID_HANDLE_VALUE)
-            __leave;
+    auto deleteHandle = [](HANDLE* handle){
+        if(*handle != INVALID_HANDLE_VALUE)
+            CloseHandle(*handle);
+    };
+    JBF::Common::UniquePtr<std::remove_pointer_t<HANDLE>, decltype(deleteHandle)> snapshotHandle(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0), deleteHandle);
+    if(snapshotHandle.get() == INVALID_HANDLE_VALUE)
+        return 0;
 
-        PROCESSENTRY32 PE32 = {};
-        PE32.dwSize = sizeof(PE32);
-        if(!Process32First(SnapshotHandle, &PE32))
-            __leave;
-
-        do{
-            if(PE32.th32ProcessID == PID){
-                PPID = PE32.th32ParentProcessID;
-                break;
-            }
+    PROCESSENTRY32 pe32 = {};
+    pe32.dwSize = sizeof(pe32);
+    if(!Process32First(snapshotHandle.get(), &pe32))
+        return 0;
+    
+    do{
+        if(pe32.th32ProcessID == pid){
+            ppid = pe32.th32ParentProcessID;
+            break;
         }
-        while(Process32Next(SnapshotHandle, &PE32));
-
     }
-    __finally{
-        if(SnapshotHandle != INVALID_HANDLE_VALUE)
-            CloseHandle(SnapshotHandle);
-    }
-    return PPID;
+    while(Process32Next(snapshotHandle.get(), &pe32));
+    
+    return ppid;
 }
 
 
@@ -56,97 +54,97 @@ static inline DWORD GetParentProcessId(){
 
 
 int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow){
-    const DWORD ParentID = GetParentProcessId();
-    if(!ParentID){
+    const DWORD parentID = GetParentProcessId();
+    if(!parentID){
         JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_NO_PARENT);
         assert(false);
         return -1;
     }
 
-    const HANDLE ParentHandle = OpenProcess(PROCESS_QUERY_INFORMATION | SYNCHRONIZE, FALSE, ParentID);
-    if(!ParentHandle){
-        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_CANNOT_LOOKUP_PARENT, ParentID);
+    const HANDLE parentHandle = OpenProcess(PROCESS_QUERY_INFORMATION | SYNCHRONIZE, FALSE, parentID);
+    if(!parentHandle){
+        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_CANNOT_LOOKUP_PARENT, parentID);
         assert(false);
         return -1;
     }
 
-    const JBF::Common::Path<TCHAR> WorkingDirectory = JBF::Common::GetModuleDirectory();
-    if(WorkingDirectory.Empty()){
+    const JBF::Common::Path<TCHAR> workingDirectory = JBF::Common::GetModuleDirectory();
+    if(workingDirectory.Empty()){
         JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_NO_MODULE_DIRECTORY);
         assert(false);
         return -1;
     }
 
-    SetCurrentDirectory(WorkingDirectory.String().c_str());
+    SetCurrentDirectory(workingDirectory.String().c_str());
 
-    JBF::Common::UniquePtr<FILE, void(*)(FILE*)> File(nullptr, [](FILE* f){ fclose(f); });
+    JBF::Common::UniquePtr<FILE, void(*)(FILE*)> file(nullptr, [](FILE* f){ fclose(f); });
     {
-        FILE* Ptr = nullptr;
-        _tfopen_s(&Ptr, LogFileName, _T("wt, ccs=UTF-8"));
-        File.reset(Ptr);
+        FILE* ptr = nullptr;
+        _tfopen_s(&ptr, logFileName, _T("wt, ccs=UTF-8"));
+        file.reset(ptr);
     }
-    if(!File){
-        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_CANNOT_OPEN_LOG_FILE, JBF::Common::Path<TCHAR>(LogFileName).Absolute().String().c_str());
+    if(!file){
+        JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_CANNOT_OPEN_LOG_FILE, JBF::Common::Path<TCHAR>(logFileName).Absolute().String().c_str());
         assert(false);
         return -1;
     }
 
-    JBF::ErrorPipe::Server<TCHAR> Pipe(ParentID);
-    if(!Pipe.IsValid()){
+    JBF::ErrorPipe::Server<TCHAR> pipe(parentID);
+    if(!pipe.IsValid()){
         JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::ERRORPIPE_SERVER_CREATE_FAILED);
         assert(false);
         return -1;
     }
 
-    if(!Pipe.WaitUntilConnected()){
+    if(!pipe.WaitUntilConnected()){
         JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::ERRORPIPE_SERVER_CONNECT_FAILED);
         assert(false);
         return -1;
     }
     
-    size_t CurCount = 0;
-    JBF::Common::String<TCHAR> TmpStr;
-    JBF::Common::String<TCHAR> StringBuffer;
-    StringBuffer.reserve(BufferCount * JBF::ErrorPipe::PipeBufferSize);
+    size_t curCount = 0;
+    JBF::Common::String<TCHAR> tmpStr;
+    JBF::Common::String<TCHAR> stringBuffer;
+    stringBuffer.reserve(bufferCount * JBF::ErrorPipe::pipeBufferSize);
     
     for(;;){
-        DWORD ExitCode;
-        if(!GetExitCodeProcess(ParentHandle, &ExitCode))
+        DWORD exitCode;
+        if(!GetExitCodeProcess(parentHandle, &exitCode))
             break;
 
-        if(ExitCode != STILL_ACTIVE)
+        if(exitCode != STILL_ACTIVE)
             break;
 
-        if(Pipe.Read(TmpStr)){
-            const auto CurrentTime = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
-            StringBuffer += std::format(_T("[{:%X}] "), CurrentTime).c_str();
-            StringBuffer += TmpStr;
-            StringBuffer += _T("\n");
-            ++CurCount;
+        if(pipe.Read(tmpStr)){
+            const auto currentTime = std::chrono::current_zone()->to_local(std::chrono::system_clock::now());
+            stringBuffer += std::format(_T("[{:%X}] "), currentTime).c_str();
+            stringBuffer += tmpStr;
+            stringBuffer += _T("\n");
+            ++curCount;
 
-            if(CurCount >= BufferCount){
-                const size_t WrittenCount = fwrite(StringBuffer.c_str(), sizeof(TCHAR), StringBuffer.length(), File.get());
-                if(WrittenCount != StringBuffer.length()){
-                    JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_WRITE_MISMATCH, StringBuffer.length(), WrittenCount);
+            if(curCount >= bufferCount){
+                const size_t writtenCount = fwrite(stringBuffer.c_str(), sizeof(TCHAR), stringBuffer.length(), file.get());
+                if(writtenCount != stringBuffer.length()){
+                    JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_WRITE_MISMATCH, stringBuffer.length(), writtenCount);
                     assert(false);
                     return -1;
                 }
                 
-                CurCount = 0;
-                StringBuffer.clear();
+                curCount = 0;
+                stringBuffer.clear();
             }
         }
     }
-    if(!StringBuffer.empty()){
-        const size_t WrittenCount = fwrite(StringBuffer.c_str(), sizeof(TCHAR), StringBuffer.length(), File.get());
-        if(WrittenCount != StringBuffer.length()){
-            JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_WRITE_MISMATCH, StringBuffer.length(), WrittenCount);
+    if(!stringBuffer.empty()){
+        const size_t writtenCount = fwrite(stringBuffer.c_str(), sizeof(TCHAR), stringBuffer.length(), file.get());
+        if(writtenCount != stringBuffer.length()){
+            JBF::Error::ShowFatalMessage(JBF::Error::FatalCode::LOGGER_WRITE_MISMATCH, stringBuffer.length(), writtenCount);
             assert(false);
             return -1;
         }
 
-        CurCount = 0;
-        StringBuffer.clear();
+        curCount = 0;
+        stringBuffer.clear();
     }
     
     return 0;

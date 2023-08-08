@@ -59,7 +59,7 @@ namespace JBF{
 
 
 namespace JBF{
-    extern Frame::WindowFrame* MainFrame;
+    extern Frame::WindowFrame* mainFrame;
 
     
     bool GraphicsAPI::InitPipeline(void* WindowHandle, bool bUseWarp){
@@ -144,7 +144,7 @@ namespace JBF{
         }
 
         unsigned Width, Height;
-        MainFrame->GetWindowSize(&Width, &Height);
+        mainFrame->GetWindowSize(&Width, &Height);
 
         {
             HWND WinHandle = reinterpret_cast<HWND>(WindowHandle);

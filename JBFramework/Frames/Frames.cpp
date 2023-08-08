@@ -12,23 +12,23 @@ namespace JBF{
     namespace Frame{
         namespace __hidden{
             FrameBase::FrameBase()
-                : LoggerPI({})
+                : loggerPI({})
             {
                 SetCurrentDirectory(Common::GetModuleDirectory().String().c_str());
 
-                TCHAR CmdLine[] = _T("JBLogger.exe");
-                STARTUPINFO SI = {};
-                SI.cb = sizeof(STARTUPINFO);
-                if(!CreateProcess(nullptr, CmdLine, nullptr, nullptr, TRUE, 0, nullptr, nullptr, &SI, &LoggerPI)){
+                TCHAR cmdLine[] = _T("JBLogger.exe");
+                STARTUPINFO si = {};
+                si.cb = sizeof(STARTUPINFO);
+                if(!CreateProcess(nullptr, cmdLine, nullptr, nullptr, TRUE, 0, nullptr, nullptr, &si, &loggerPI)){
                     Error::ShowFatalMessage(Error::FatalCode::LOGGER_CANNOT_EXECUTE);
                     assert(false);
                     return;
                 }
             }
             FrameBase::~FrameBase(){
-                if(LoggerPI.hProcess){
-                    CloseHandle(LoggerPI.hProcess);
-                    CloseHandle(LoggerPI.hThread);
+                if(loggerPI.hProcess){
+                    CloseHandle(loggerPI.hProcess);
+                    CloseHandle(loggerPI.hThread);
                 }
             }
         };
@@ -40,14 +40,14 @@ namespace JBF{
 
 
 namespace JBF{
-    Frame::WindowFrame* MainFrame = nullptr;
+    Frame::WindowFrame* mainFrame = nullptr;
 
     
     namespace Frame{
-        WindowFrame::WindowFrame(void* InstanceHandle, const TCHAR* AppName, unsigned Width, unsigned Height)
+        WindowFrame::WindowFrame(void* instanceHandle, const TCHAR* appName, unsigned width, unsigned height)
             : FrameBase()
-            , ErrorPipeClient(GetCurrentProcessId(), 10000)
-            , WindowHandle(nullptr)
+            , errorPipeClient(GetCurrentProcessId(), 10000)
+            , windowHandle(nullptr)
             , bIsActive(false)
         {
             void* LoggerHandle = nullptr;
@@ -59,7 +59,7 @@ namespace JBF{
                 return;
             }
             
-            if(!ErrorPipeClient.IsValid()){
+            if(!errorPipeClient.IsValid()){
                 Error::ShowFatalMessage(Error::FatalCode::ERRORPIPE_CLIENT_CREATE_FAILED);
                 assert(false);
                 return;
@@ -70,13 +70,13 @@ namespace JBF{
                 WC.cbSize = sizeof(WNDCLASSEX);
                 WC.style = CS_HREDRAW | CS_VREDRAW;
                 WC.lpfnWndProc = MessageProcessor;
-                WC.hInstance = reinterpret_cast<decltype(WC.hInstance)>(InstanceHandle);
+                WC.hInstance = reinterpret_cast<decltype(WC.hInstance)>(instanceHandle);
                 WC.hCursor = LoadCursor(nullptr, IDC_ARROW);
                 WC.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW);
-                WC.lpszClassName = AppName;
+                WC.lpszClassName = appName;
             }
             if(!RegisterClassEx(&WC)){
-                ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_REGISTERCLASS_FAILED));
+                errorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_REGISTERCLASS_FAILED));
                 assert(false);
                 return;
             }
@@ -84,12 +84,12 @@ namespace JBF{
             static constexpr DWORD StyleEx = 0;
             static constexpr DWORD Style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 
-            RECT RC = {0, 0, static_cast<long>(Width), static_cast<long>(Height)};
+            RECT RC = {0, 0, static_cast<long>(width), static_cast<long>(height)};
 
-            WindowHandle = CreateWindowEx(
+            windowHandle = CreateWindowEx(
                 StyleEx,
                 WC.lpszClassName,
-                AppName,
+                appName,
                 Style,
                 0,
                 0,
@@ -100,16 +100,16 @@ namespace JBF{
                 WC.hInstance,
                 nullptr
             );
-            if(!WindowHandle){
-                ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_CREATE_FAILED));
+            if(!windowHandle){
+                errorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_CREATE_FAILED));
                 assert(false);
                 return;
             }
 
             {
                 if(!AdjustWindowRectEx(&RC, Style, FALSE, StyleEx)){
-                    ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_ADJUST_FAILED));
-                    WindowHandle = nullptr;
+                    errorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_ADJUST_FAILED));
+                    windowHandle = nullptr;
                     assert(false);
                     return;
                 }
@@ -119,33 +119,33 @@ namespace JBF{
                 const long X = (GetSystemMetrics(SM_CXSCREEN) - ActualWidth) >> 1;
                 const long Y = (GetSystemMetrics(SM_CYSCREEN) - ActualHeight) >> 1;
     
-                if(!MoveWindow(WindowHandle, X, Y, ActualWidth, ActualHeight, false)){
-                    ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_MOVE_FAILED, WindowHandle));
-                    WindowHandle = nullptr;
+                if(!MoveWindow(windowHandle, X, Y, ActualWidth, ActualHeight, false)){
+                    errorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_WINDOW_MOVE_FAILED, windowHandle));
+                    windowHandle = nullptr;
                     assert(false);
                     return;
                 }
             }
 
-            MainFrame = this;
+            mainFrame = this;
         }
         WindowFrame::~WindowFrame(){
             if(!DestroyInternal()){
-                ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_DESTROY_FAILED));
+                errorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_DESTROY_FAILED));
                 assert(false);
             }
-            MainFrame = nullptr;
+            mainFrame = nullptr;
         }
 
 
         bool WindowFrame::Init(){
             if(!InitInternal()){
-                ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_INIT_FAILED));
+                errorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_INIT_FAILED));
                 assert(false);
                 return false;
             }
             
-            ShowWindow(WindowHandle, SW_SHOW);
+            ShowWindow(windowHandle, SW_SHOW);
             return true;
         }
         bool WindowFrame::Run(){
@@ -177,7 +177,7 @@ namespace JBF{
                 LateTime = CurrentTime;
                 
                 if(!UpdateInternal(TimeDifference.count())){
-                    ErrorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_UPDATE_FAILED));
+                    errorPipeClient.PushMessage(Error::GetErrorMessage(Error::ErrorCode::FRAME_UPDATE_FAILED));
                     assert(false);
                     break;
                 }
@@ -187,7 +187,7 @@ namespace JBF{
 
 
         bool WindowFrame::InitInternal(){
-            if(!GraphicsModule.Init(WindowHandle, false))
+            if(!graphicsModule.Init(windowHandle, false))
                 return false;
             
             return true;
@@ -201,7 +201,7 @@ namespace JBF{
 
 
         LRESULT CALLBACK WindowFrame::MessageProcessor(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
-            if(WindowFrame* This = MainFrame){
+            if(WindowFrame* This = mainFrame){
                 PAINTSTRUCT PS;
                 
                 switch(message){

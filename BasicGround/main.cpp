@@ -5,14 +5,14 @@
 
 
 int _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow){
-    JBF::Frame::WindowFrame Frame(hInstance, _T("JB_BasicGround"), 800, 600);
-    if(!Frame.IsValid())
+    JBF::Frame::WindowFrame frame(hInstance, _T("JB_BasicGround"), 800, 600);
+    if(!frame.IsValid())
         return -1;
 
-    if(!JBF::MainFrame->Init())
+    if(!JBF::mainFrame->Init())
         return -1;
     
-    if(!JBF::MainFrame->Run())
+    if(!JBF::mainFrame->Run())
         return -1;
     
     return 0;

@@ -10,23 +10,23 @@
 namespace JBF{
     namespace Common{
         Path<TCHAR> GetModuleDirectory(){
-            FixedVector<wchar_t, MAX_PATH, true> Buffer; 
-            DWORD StrLen = 0;
+            FixedVector<wchar_t, MAX_PATH, true> buffer; 
+            DWORD strLen = 0;
             do{
-                Buffer.resize(Buffer.size() + MAX_PATH);
-                StrLen = GetModuleFileName(nullptr, Buffer.data(), static_cast<DWORD>(Buffer.size()));
+                buffer.resize(buffer.size() + MAX_PATH);
+                strLen = GetModuleFileName(nullptr, buffer.data(), static_cast<DWORD>(buffer.size()));
             }
-            while(StrLen >= Buffer.size());
-            Buffer.resize(StrLen);
+            while(strLen >= buffer.size());
+            buffer.resize(strLen);
             
-            if(!Buffer.size())
-                return JBF::Common::Path<TCHAR>();
+            if(buffer.empty())
+                return {};
 
-            JBF::Common::Path<TCHAR> Result(String<TCHAR>(Buffer.begin(), Buffer.end()));
-            Result = Result.Parent();
-            Result = Result.Absolute();
+            Path<TCHAR> result(String<TCHAR>(buffer.begin(), buffer.end()));
+            result = result.Parent();
+            result = result.Absolute();
 
-            return std::move(Result);
+            return result;
         }
     };
 };

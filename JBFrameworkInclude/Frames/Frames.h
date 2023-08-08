@@ -15,18 +15,18 @@
 
 namespace JBF{
     template<typename... ARGS>
-    extern void PushLog(const Common::String<TCHAR>& Message, ARGS&&... Args);
+    extern void PushLog(const Common::String<TCHAR>& message, ARGS&&... args);
     template<typename... ARGS>
-    extern void PushLog(Common::String<TCHAR>&& Message, ARGS&&... Args);
+    extern void PushLog(Common::String<TCHAR>&& message, ARGS&&... args);
     template<typename... ARGS>
-    extern void PushLog(const Common::StringView<TCHAR>& Message, ARGS&&... Args);
+    extern void PushLog(const Common::StringView<TCHAR>& message, ARGS&&... args);
     template<typename... ARGS>
-    extern void PushLog(const TCHAR* Message, ARGS&&... Args);
+    extern void PushLog(const TCHAR* message, ARGS&&... args);
 
     template<typename... ARGS>
-    extern void PushError(Error::ErrorCode Code, ARGS&&... Args);
+    extern void PushError(Error::ErrorCode code, ARGS&&... args);
     template<typename... ARGS>
-    extern void PushWarning(Error::WarningCode Code, ARGS&&... Args);
+    extern void PushWarning(Error::WarningCode code, ARGS&&... args);
 
     
     namespace Frame{
@@ -38,51 +38,51 @@ namespace JBF{
 
 
             public:
-                inline bool IsLoggerValid(void** OutHandle)const{
-                    (*OutHandle) = LoggerPI.hProcess;
+                inline bool IsLoggerValid(void** outHandle)const{
+                    (*outHandle) = loggerPI.hProcess;
                     
-                    if(!LoggerPI.hProcess)
+                    if(!loggerPI.hProcess)
                         return false;
 
-                    DWORD ExitCode;
-                    if(!GetExitCodeProcess(LoggerPI.hProcess, &ExitCode))
+                    DWORD exitCode;
+                    if(!GetExitCodeProcess(loggerPI.hProcess, &exitCode))
                         return false;
 
-                    if(ExitCode != STILL_ACTIVE)
+                    if(exitCode != STILL_ACTIVE)
                         return false;
                     
                     return true;
                 }
                 inline bool IsLoggerValid()const{
-                    void* Dummy = nullptr;
-                    return IsLoggerValid(&Dummy);
+                    void* dummy = nullptr;
+                    return IsLoggerValid(&dummy);
                 }
                 
                 
             private:
-                PROCESS_INFORMATION LoggerPI;
+                PROCESS_INFORMATION loggerPI;
             };
         };
         
         class WindowFrame : public __hidden::FrameBase{
         private:
-            static constexpr size_t ReservedFrameSize = 4;
+            static constexpr size_t reservedFrameSize = 4;
 
             
         public:
-            WindowFrame(void* InstanceHandle, const TCHAR* AppName, unsigned Width, unsigned Height);
+            WindowFrame(void* instanceHandle, const TCHAR* appName, unsigned width, unsigned height);
             virtual ~WindowFrame()override;
 
 
         public:
-            inline bool IsValid()const{ return WindowHandle != nullptr; }
+            inline bool IsValid()const{ return windowHandle != nullptr; }
             inline bool IsActive()const{ return bIsActive; }
 
-            inline void GetWindowSize(unsigned* Width, unsigned* Height)const{
-                RECT RC;
-                GetWindowRect(WindowHandle, &RC);
-                (*Width) = static_cast<unsigned>(RC.right - RC.left);
-                (*Height) = static_cast<unsigned>(RC.bottom - RC.top);
+            inline void GetWindowSize(unsigned* width, unsigned* height)const{
+                RECT rc;
+                GetWindowRect(windowHandle, &rc);
+                (*width) = static_cast<unsigned>(rc.right - rc.left);
+                (*height) = static_cast<unsigned>(rc.bottom - rc.top);
             }
 
 
@@ -102,71 +102,71 @@ namespace JBF{
 
             
         private:
-            ErrorPipe::Client<TCHAR> ErrorPipeClient;
-            GraphicsAPI GraphicsModule;
+            ErrorPipe::Client<TCHAR> errorPipeClient;
+            GraphicsAPI graphicsModule;
 
         private:
-            HWND WindowHandle;
+            HWND windowHandle;
             bool bIsActive;
 
 
         public:
             template<typename... ARGS>
-            friend void JBF::PushLog(const Common::String<TCHAR>& Message, ARGS&&... Args);
+            friend void JBF::PushLog(const Common::String<TCHAR>& message, ARGS&&... args);
             template<typename... ARGS>
-            friend void JBF::PushLog(Common::String<TCHAR>&& Message, ARGS&&... Args);
+            friend void JBF::PushLog(Common::String<TCHAR>&& message, ARGS&&... args);
             template<typename... ARGS>
-            friend void JBF::PushLog(const Common::StringView<TCHAR>& Message, ARGS&&... Args);
+            friend void JBF::PushLog(const Common::StringView<TCHAR>& message, ARGS&&... args);
             template<typename... ARGS>
-            friend void JBF::PushLog(const TCHAR* Message, ARGS&&... Args);
+            friend void JBF::PushLog(const TCHAR* message, ARGS&&... args);
 
             template<typename... ARGS>
-            friend void JBF::PushError(Error::ErrorCode Code, ARGS&&... Args);
+            friend void JBF::PushError(Error::ErrorCode code, ARGS&&... args);
             template<typename... ARGS>
-            friend void JBF::PushWarning(Error::WarningCode Code, ARGS&&... Args);
+            friend void JBF::PushWarning(Error::WarningCode code, ARGS&&... args);
         };
     };
 
 
-    extern Frame::WindowFrame* MainFrame;
+    extern Frame::WindowFrame* mainFrame;
 
 
     template<typename... ARGS>
-    inline void PushLog(const Common::String<TCHAR>& Message, ARGS&&... Args){
+    inline void PushLog(const Common::String<TCHAR>& message, ARGS&&... args){
         if(sizeof...(ARGS) > 0)
-            MainFrame->ErrorPipeClient.PushMessage(Common::Format<TCHAR>(Message, std::forward<ARGS>(Args)...));
+            mainFrame->errorPipeClient.PushMessage(Common::Format<TCHAR>(message, std::forward<ARGS>(args)...));
         else
-            MainFrame->ErrorPipeClient.PushMessage(Message);
+            mainFrame->errorPipeClient.PushMessage(message);
     }
     template<typename... ARGS>
-    inline void PushLog(Common::String<TCHAR>&& Message, ARGS&&... Args){
+    inline void PushLog(Common::String<TCHAR>&& message, ARGS&&... args){
         if(sizeof...(ARGS) > 0)
-            MainFrame->ErrorPipeClient.PushMessage(Common::Format<TCHAR>(Message, std::forward<ARGS>(Args)...));
+            mainFrame->errorPipeClient.PushMessage(Common::Format<TCHAR>(message, std::forward<ARGS>(args)...));
         else
-            MainFrame->ErrorPipeClient.PushMessage(std::move(Message));
+            mainFrame->errorPipeClient.PushMessage(std::move(message));
     }
     template<typename... ARGS>
-    inline void PushLog(const Common::StringView<TCHAR>& Message, ARGS&&... Args){
+    inline void PushLog(const Common::StringView<TCHAR>& message, ARGS&&... args){
         if(sizeof...(ARGS) > 0)
-            MainFrame->ErrorPipeClient.PushMessage(Common::Format<TCHAR>(Message, std::forward<ARGS>(Args)...));
+            mainFrame->errorPipeClient.PushMessage(Common::Format<TCHAR>(message, std::forward<ARGS>(args)...));
         else
-            MainFrame->ErrorPipeClient.PushMessage(Message.data());
+            mainFrame->errorPipeClient.PushMessage(message.data());
     }
     template<typename... ARGS>
-    inline void PushLog(const TCHAR* Message, ARGS&&... Args){
+    inline void PushLog(const TCHAR* message, ARGS&&... args){
         if(sizeof...(ARGS) > 0)
-            MainFrame->ErrorPipeClient.PushMessage(Common::Format<TCHAR>(Message, std::forward<ARGS>(Args)...));
+            mainFrame->errorPipeClient.PushMessage(Common::Format<TCHAR>(message, std::forward<ARGS>(args)...));
         else
-            MainFrame->ErrorPipeClient.PushMessage(Message);
+            mainFrame->errorPipeClient.PushMessage(message);
     }
 
     template<typename... ARGS>
-    inline void PushError(Error::ErrorCode Code, ARGS&&... Args){
-        MainFrame->ErrorPipeClient.PushMessage(_T("!Error! ") + Error::GetErrorMessage(Code, std::forward<ARGS>(Args)...));
+    inline void PushError(Error::ErrorCode code, ARGS&&... args){
+        mainFrame->errorPipeClient.PushMessage(_T("!Error! ") + Error::GetErrorMessage(code, std::forward<ARGS>(args)...));
     }
     template<typename... ARGS>
-    inline void PushWarning(Error::WarningCode Code, ARGS&&... Args){
-        MainFrame->ErrorPipeClient.PushMessage(_T("!Warning! ") + Error::GetWarningMessage(Code, std::forward<ARGS>(Args)...));
+    inline void PushWarning(Error::WarningCode code, ARGS&&... args){
+        mainFrame->errorPipeClient.PushMessage(_T("!Warning! ") + Error::GetWarningMessage(code, std::forward<ARGS>(args)...));
     }
 };
 
