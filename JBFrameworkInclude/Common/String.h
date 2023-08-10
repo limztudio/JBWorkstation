@@ -3,6 +3,7 @@
 
 
 #include <tchar.h>
+#include <format>
 
 #include <../JBFramework/EASTL/string.h>
 #include <../JBFramework/EASTL/string_view.h>
@@ -30,15 +31,28 @@ namespace JBF{
 
         template<typename T = TCHAR, typename... ARGS>
         inline String<T> Format(const T* text, ARGS&&... args){
-            String<T> result;
-            result.sprintf(text, std::forward<ARGS>(args)...);
-            return result;
+            static thread_local std::locale Locale = {};
+            std::basic_string<T> Result = std::format<T>(Locale, text, std::forward<ARGS>(args)...);
+            return String<T>(Result.begin(), Result.end());
         }
         template<typename T = TCHAR, typename... ARGS>
         inline String<T> Format(const StringView<T>& text, ARGS&&... args){
-            String<T> result;
-            result.sprintf(text.data(), std::forward<ARGS>(args)...);
-            return result;
+            static thread_local std::locale Locale = {};
+            std::basic_string<T> Result = std::format<T>(Locale, text.data(), std::forward<ARGS>(args)...);
+            return String<T>(Result.begin(), Result.end());
+        }
+
+        template<typename T = TCHAR, typename... ARGS>
+        inline String<T> FastFormat(const T* Text, ARGS&&... Args){
+            String<T> Result;
+            Result.sprintf(Text, std::forward<ARGS>(Args)...);
+            return std::move(Result);
+        }
+        template<typename T = TCHAR, typename... ARGS>
+        inline String<T> FastFormat(const StringView<T>& text, ARGS&&... args){
+            String<T> Result;
+            Result.sprintf(text.data(), std::forward<ARGS>(args)...);
+            return std::move(Result);
         }
     };
 };

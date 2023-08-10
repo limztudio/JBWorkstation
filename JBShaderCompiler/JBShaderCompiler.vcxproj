@@ -13,8 +13,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{759D2D4B-B93B-42FB-801F-A2F0C72288F8}</ProjectGuid>
-    <RootNamespace>BasicGround</RootNamespace>
+    <ProjectGuid>{87851D0D-F516-4037-BC88-61F4F326FAE3}</ProjectGuid>
+    <RootNamespace>JBShaderCompiler</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -100,9 +100,6 @@
     </ProjectReference>
     <ProjectReference Include="..\JBLogger\JBLogger.vcxproj">
       <Project>{eae82a56-4f32-4088-9560-bc718acf34f1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\JBShaderCompiler\JBShaderCompiler.vcxproj">
-      <Project>{87851d0d-f516-4037-bc88-61f4f326fae3}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

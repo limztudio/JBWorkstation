@@ -263,6 +263,9 @@
     <ClInclude Include="GraphicsAPI\GraphicsAPIMacro.hpp">
       <Filter>Internal\GraphicsAPI</Filter>
     </ClInclude>
+    <ClInclude Include="..\JBFrameworkInclude\Common\Math.h">
+      <Filter>External\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DirectXMath\Inc\DirectXCollision.inl">

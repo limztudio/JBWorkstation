@@ -8,49 +8,51 @@
 
 
 namespace JBF{
-    namespace __hidden_GraphicsAPI{
-        void EnumHardwareAdapter(IDXGIFactory1* FactoryPtr, IDXGIAdapter1** AdapterPtr, bool bPreferHighPerformanceAdapter = true){
-            (*AdapterPtr) = nullptr;
+    namespace Graphics{
+        namespace __hidden{
+            void EnumHardwareAdapter(IDXGIFactory1* FactoryPtr, IDXGIAdapter1** AdapterPtr, bool bPreferHighPerformanceAdapter = true){
+                (*AdapterPtr) = nullptr;
 
-            GraphicsAPI::COM<IDXGIAdapter1> Adapter;
-            auto LoopScope = [&Adapter](UINT i){
-                DXGI_ADAPTER_DESC1 DESC;
-                Adapter->GetDesc1(&DESC);
+                COM<IDXGIAdapter1> Adapter;
+                auto LoopScope = [&Adapter](UINT i){
+                    DXGI_ADAPTER_DESC1 Desc;
+                    Adapter->GetDesc1(&Desc);
 
-                if(DESC.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+                    if(Desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+                        return true;
+
+                    if(SUCCEEDED(D3D12CreateDevice(Adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
+                        return false;
+
                     return true;
+                };
 
-                if(SUCCEEDED(D3D12CreateDevice(Adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
-                    return false;
+                COM<IDXGIFactory6> Factory;
+                if(SUCCEEDED(FactoryPtr->QueryInterface(IID_PPV_ARGS(&Factory)))){
+                    if(bPreferHighPerformanceAdapter){
+                        for(UINT i = 0; SUCCEEDED(Factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&Adapter))); ++i){
+                            if(!LoopScope(i))
+                                break;
+                        }
+                    }
+                    else{
+                        for(UINT i = 0; SUCCEEDED(Factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_UNSPECIFIED, IID_PPV_ARGS(&Adapter))); ++i){
+                            if(!LoopScope(i))
+                                break;
+                        }
+                    }
+                }
 
-                return true;
-            };
-
-            GraphicsAPI::COM<IDXGIFactory6> Factory;
-            if(SUCCEEDED(FactoryPtr->QueryInterface(IID_PPV_ARGS(&Factory)))){
-                if(bPreferHighPerformanceAdapter){
-                    for(UINT i = 0; SUCCEEDED(Factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&Adapter))); ++i){
+                if(!Adapter.Get()){
+                    for(UINT i = 0; SUCCEEDED(FactoryPtr->EnumAdapters1(i, &Adapter)); ++i){
                         if(!LoopScope(i))
                             break;
                     }
                 }
-                else{
-                    for(UINT i = 0; SUCCEEDED(Factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_UNSPECIFIED, IID_PPV_ARGS(&Adapter))); ++i){
-                        if(!LoopScope(i))
-                            break;
-                    }
-                }
-            }
 
-            if(!Adapter.Get()){
-                for(UINT i = 0; SUCCEEDED(FactoryPtr->EnumAdapters1(i, &Adapter)); ++i){
-                    if(!LoopScope(i))
-                        break;
-                }
+                (*AdapterPtr) = Adapter.Detach();
             }
-
-            (*AdapterPtr) = Adapter.Detach();
-        }
+        };
     };
 };
 
@@ -67,7 +69,7 @@ namespace JBF{
 
 #ifdef _DEBUG
         {
-            COM<ID3D12Debug> DebugController;
+            Graphics::COM<ID3D12Debug> DebugController;
             if(SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&DebugController)))){
                 DebugController->EnableDebugLayer();
                 
@@ -78,7 +80,7 @@ namespace JBF{
         }
 #endif
 
-        COM<IDXGIFactory4> Factory;
+        Graphics::COM<IDXGIFactory4> Factory;
         if(FAILED(CreateDXGIFactory2(DXGIFactoryFlags, IID_PPV_ARGS(&Factory)))){
             PushError(Error::ErrorCode::GAPI_FACTORY_CREATE_FAILED);
             assert(false);
@@ -86,7 +88,7 @@ namespace JBF{
         }
 
         if(bUseWarp){
-            COM<IDXGIAdapter> Adapter;
+            Graphics::COM<IDXGIAdapter> Adapter;
             if(FAILED(Factory->EnumWarpAdapter(IID_PPV_ARGS(&Adapter)))){
                 PushError(Error::ErrorCode::GAPI_WARP_ADAPTER_ENUM_FAILED);
                 assert(false);
@@ -100,8 +102,8 @@ namespace JBF{
             }
         }
         else{
-            COM<IDXGIAdapter1> Adapter;
-            __hidden_GraphicsAPI::EnumHardwareAdapter(Factory.Get(), &Adapter, true);
+            Graphics::COM<IDXGIAdapter1> Adapter;
+            Graphics::__hidden::EnumHardwareAdapter(Factory.Get(), &Adapter, true);
 
             if(FAILED(D3D12CreateDevice(Adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&Device)))){
                 PushError(Error::ErrorCode::GAPI_DEVICE_CREATE_FAILED);
@@ -131,11 +133,11 @@ namespace JBF{
         }
 
         {
-            D3D12_COMMAND_QUEUE_DESC DESC = {};
-            DESC.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-            DESC.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+            D3D12_COMMAND_QUEUE_DESC Desc = {};
+            Desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+            Desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-            if(FAILED(Device->CreateCommandQueue(&DESC, IID_PPV_ARGS(&CommandQueue)))){
+            if(FAILED(Device->CreateCommandQueue(&Desc, IID_PPV_ARGS(&CommandQueue)))){
                 PushError(Error::ErrorCode::GAPI_COMMAND_QUEUE_CREATE_FAILED);
                 assert(false);
                 return false;
@@ -149,18 +151,18 @@ namespace JBF{
         {
             HWND WinHandle = reinterpret_cast<HWND>(WindowHandle);
             
-            DXGI_SWAP_CHAIN_DESC1 DESC = {};
-            DESC.BufferCount = FrameCount;
-            DESC.Width = static_cast<decltype(DESC.Width)>(Width);
-            DESC.Height = static_cast<decltype(DESC.Height)>(Height);
-            DESC.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            DESC.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-            DESC.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-            DESC.SampleDesc.Count = 1;
-            DESC.Flags = bUseVsync ? 0 : DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+            DXGI_SWAP_CHAIN_DESC1 Desc = {};
+            Desc.BufferCount = FrameCount;
+            Desc.Width = static_cast<decltype(Desc.Width)>(Width);
+            Desc.Height = static_cast<decltype(Desc.Height)>(Height);
+            Desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            Desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+            Desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+            Desc.SampleDesc.Count = 1;
+            Desc.Flags = bUseVsync ? 0 : DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
-            COM<IDXGISwapChain1> LocalSwapChain;
-            if(FAILED(Factory->CreateSwapChainForHwnd(CommandQueue.Get(), WinHandle, &DESC, nullptr, nullptr, &LocalSwapChain))){
+            Graphics::COM<IDXGISwapChain1> LocalSwapChain;
+            if(FAILED(Factory->CreateSwapChainForHwnd(CommandQueue.Get(), WinHandle, &Desc, nullptr, nullptr, &LocalSwapChain))){
                 PushError(Error::ErrorCode::GAPI_SWAP_CHAIN_CREATE_FAILED);
                 assert(false);
                 return false;
@@ -179,31 +181,33 @@ namespace JBF{
         }
 
         {
-            D3D12_DESCRIPTOR_HEAP_DESC DESC = {};
-            DESC.NumDescriptors = FrameCount;
-            DESC.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-            DESC.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+            D3D12_DESCRIPTOR_HEAP_DESC Desc = {};
+            Desc.NumDescriptors = FrameCount;
+            Desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+            Desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
             
-            if(FAILED(Device->CreateDescriptorHeap(&DESC, IID_PPV_ARGS(&RTVHeap)))){
+            if(FAILED(Device->CreateDescriptorHeap(&Desc, IID_PPV_ARGS(&RTVHeap)))){
                 PushError(Error::ErrorCode::GAPI_RTV_HEAP_CREATE_FAILED);
                 assert(false);
                 return false;
             }
+            OBJECT_SET_NAME(RTVHeap);
 
             RVTDescSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
         }
 
         {
-            D3D12_DESCRIPTOR_HEAP_DESC DESC = {};
-            DESC.NumDescriptors = 1;
-            DESC.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-            DESC.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+            D3D12_DESCRIPTOR_HEAP_DESC Desc = {};
+            Desc.NumDescriptors = 1;
+            Desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+            Desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
             
-            if(FAILED(Device->CreateDescriptorHeap(&DESC, IID_PPV_ARGS(&DSVHeap)))){
+            if(FAILED(Device->CreateDescriptorHeap(&Desc, IID_PPV_ARGS(&DSVHeap)))){
                 PushError(Error::ErrorCode::GAPI_DSV_HEAP_CREATE_FAILED);
                 assert(false);
                 return false;
             }
+            OBJECT_SET_NAME(DSVHeap);
 
             DSVDescSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
         }
@@ -262,7 +266,7 @@ namespace JBF{
             TextureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
             
             if(FAILED(Device->CreateCommittedResource(&HeapProps, D3D12_HEAP_FLAG_NONE, &TextureDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &ClearValue, IID_PPV_ARGS(&DSBuffer)))){
-                PushError(Error::ErrorCode::GAPI_CREATE_DS_BUFFER_FAILED);
+                PushError(Error::ErrorCode::GAPI_DS_BUFFER_CREATE_FAILED);
                 assert(false);
                 return false;
             }
@@ -272,8 +276,51 @@ namespace JBF{
         }
 
         {
+            constexpr UINT64 Size = sizeof(Graphics::ConstantBuffer) * FrameCount;
             
+            D3D12_HEAP_PROPERTIES HeapProps = {};
+            HeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+            HeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+            HeapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+            HeapProps.CreationNodeMask = 1;
+            HeapProps.VisibleNodeMask = 1;
+
+            D3D12_RESOURCE_DESC BufferDesc = {};
+            BufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+            BufferDesc.Alignment = 0;
+            BufferDesc.Width = Size * FrameCount;
+            BufferDesc.Height = 1;
+            BufferDesc.DepthOrArraySize = 1;
+            BufferDesc.MipLevels = 1;
+            BufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+            BufferDesc.SampleDesc.Count = 1;
+            BufferDesc.SampleDesc.Quality = 0;
+            BufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+            BufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+                    
+            if(FAILED(Device->CreateCommittedResource(&HeapProps, D3D12_HEAP_FLAG_NONE, &BufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&CSBuffer)))){
+                PushError(Error::ErrorCode::GAPI_CS_BUFFER_CREATE_FAILED);
+                assert(false);
+                return false;
+            }
+
+            D3D12_CONSTANT_BUFFER_VIEW_DESC ViewDesc = {};
+            ViewDesc.BufferLocation = CSBuffer->GetGPUVirtualAddress();
+            ViewDesc.SizeInBytes = Size;
+
+            D3D12_RANGE ReadRange = { 0, 0 };
+            if(FAILED(CSBuffer->Map(0, &ReadRange, reinterpret_cast<void**>(&CSBufferView)))){
+                PushError(Error::ErrorCode::GAPI_CS_BUFFER_MAP_FAILED);
+                assert(false);
+                return false;
+            }
         }
+        
+        return true;
+    }
+
+    bool GraphicsAPI::ReadAssets(){
+
         
         return true;
     }
