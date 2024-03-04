@@ -16,6 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "thirdparty", "thirdparty", "{CA60B606-E118-47B7-93E2-B3D51387B779}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EASTL", "thirdparty\EASTL\EASTL.vcxproj", "{DF0D4049-3728-4227-B523-A54CC1A16794}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -38,9 +42,16 @@ Global
 		{87851D0D-F516-4037-BC88-61F4F326FAE3}.Debug|x64.Build.0 = Debug|x64
 		{87851D0D-F516-4037-BC88-61F4F326FAE3}.Release|x64.ActiveCfg = Release|x64
 		{87851D0D-F516-4037-BC88-61F4F326FAE3}.Release|x64.Build.0 = Release|x64
+		{DF0D4049-3728-4227-B523-A54CC1A16794}.Debug|x64.ActiveCfg = Debug|x64
+		{DF0D4049-3728-4227-B523-A54CC1A16794}.Debug|x64.Build.0 = Debug|x64
+		{DF0D4049-3728-4227-B523-A54CC1A16794}.Release|x64.ActiveCfg = Release|x64
+		{DF0D4049-3728-4227-B523-A54CC1A16794}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DF0D4049-3728-4227-B523-A54CC1A16794} = {CA60B606-E118-47B7-93E2-B3D51387B779}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B02E034-F308-4AFB-B304-385671A6CF40}
