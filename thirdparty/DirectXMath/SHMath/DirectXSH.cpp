@@ -19,9 +19,11 @@
 #pragma clang diagnostic ignored "-Wshadow"
 #pragma clang diagnostic ignored "-Wunused-const-variable"
 #pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
 
-#include "DirectXMath/SHMath/DirectXSH.h"
+#include "DirectXSH.h"
 #include <cassert>
 
 using namespace DirectX;

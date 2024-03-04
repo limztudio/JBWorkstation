@@ -5,7 +5,7 @@
 // Licensed under the MIT License.
 //-------------------------------------------------------------------------------------
 
-#include "DirectXMath/Stereo3D/Stereo3DMatrixHelper.h"
+#include "Stereo3DMatrixHelper.h"
 
 using namespace DirectX;
 

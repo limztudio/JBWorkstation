@@ -29,7 +29,7 @@ inline bool XMVerifyAVX2Support()
 
     // See http://msdn.microsoft.com/en-us/library/hskdteyh.aspx
     int CPUInfo[4] = {-1};
-#if defined(__clang__) || defined(__GNUC__)
+#if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
     __cpuid(0, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 #else
     __cpuid(CPUInfo, 0);
@@ -38,7 +38,7 @@ inline bool XMVerifyAVX2Support()
     if ( CPUInfo[0] < 7  )
         return false;
 
-#if defined(__clang__) || defined(__GNUC__)
+#if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
     __cpuid(1, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 #else
     __cpuid(CPUInfo, 1);
@@ -487,12 +487,12 @@ namespace Internal
         static XMVECTOR XM_CALLCONV Permute(FXMVECTOR v1, FXMVECTOR v2)
         {
             static const XMVECTORU32 selectMask =
-            {
+            { { {
                 WhichX ? 0xFFFFFFFF : 0,
                 WhichY ? 0xFFFFFFFF : 0,
                 WhichZ ? 0xFFFFFFFF : 0,
                 WhichW ? 0xFFFFFFFF : 0,
-            };
+            } } };
 
             XMVECTOR shuffled1 = _mm_permute_ps(v1, Shuffle);
             XMVECTOR shuffled2 = _mm_permute_ps(v2, Shuffle);

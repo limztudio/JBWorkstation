@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------------------
-// DirectXMathFMA4.h -- FMA4 extensions for SIMD C++ Math library
+// DirectXMathFMA3.h -- FMA3 extensions for SIMD C++ Math library
 //
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
@@ -10,65 +10,41 @@
 #pragma once
 
 #if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || __arm__ || __aarch64__
-#error FMA4 not supported on ARM platform
+#error FMA3 not supported on ARM platform
 #endif
 
 #include <DirectXMath.h>
-#include <ammintrin.h>
-
-#ifdef __GNUC__
-#include <x86intrin.h>
-#endif
 
 namespace DirectX
 {
 
-namespace FMA4
+namespace FMA3
 {
 
-inline bool XMVerifyFMA4Support()
+inline bool XMVerifyFMA3Support()
 {
-    // Should return true for AMD Bulldozer processors
+    // Should return true for AMD "Pildriver" and Intel "Haswell" processors
     // with OS support for AVX (Windows 7 Service Pack 1, Windows Server 2008 R2 Service Pack 1, Windows 8, Windows Server 2012)
 
-   // See http://msdn.microsoft.com/en-us/library/hskdteyh.aspx
-   int CPUInfo[4] = {-1};
-#if defined(__clang__) || defined(__GNUC__)
-   __cpuid(0, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
+    // See http://msdn.microsoft.com/en-us/library/hskdteyh.aspx
+    int CPUInfo[4] = {-1};
+#if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
+    __cpuid(0, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 #else
-   __cpuid(CPUInfo, 0);
+    __cpuid(CPUInfo, 0);
 #endif
 
-   if ( CPUInfo[0] < 1  )
-       return false;
-
-#if defined(__clang__) || defined(__GNUC__)
-   __cpuid(1, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
-#else
-   __cpuid(CPUInfo, 1);
-#endif
-
-    // We check for AVX, OSXSAVE (required to access FMA4)
-    if ( (CPUInfo[2] & 0x18000000) != 0x18000000 )
+    if ( CPUInfo[0] < 1  )
         return false;
 
-#if defined(__clang__) || defined(__GNUC__)
-    __cpuid(0x80000000, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
+#if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
+    __cpuid(1, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 #else
-    __cpuid(CPUInfo, 0x80000000);
+    __cpuid(CPUInfo, 1);
 #endif
 
-    if ( uint32_t(CPUInfo[0]) < 0x80000001u )
-        return false;
-
-    // We check for FMA4
-#if defined(__clang__) || defined(__GNUC__)
-    __cpuid(0x80000001, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
-#else
-    __cpuid(CPUInfo, 0x80000001);
-#endif
-
-    return ( CPUInfo[2] & 0x10000 );
+    // We check for FMA3, AVX, OSXSAVE
+    return ( (CPUInfo[2] & 0x18001000) == 0x18001000 );
 }
 
 
@@ -83,7 +59,7 @@ inline XMVECTOR XM_CALLCONV XMVectorMultiplyAdd
     FXMVECTOR V3
 )
 {
-    return _mm_macc_ps( V1, V2, V3 );
+    return _mm_fmadd_ps( V1, V2, V3 );
 }
 
 inline XMVECTOR XM_CALLCONV XMVectorNegativeMultiplySubtract
@@ -93,7 +69,7 @@ inline XMVECTOR XM_CALLCONV XMVectorNegativeMultiplySubtract
     FXMVECTOR V3
 )
 {
-    return _mm_nmacc_ps( V1, V2, V3 );
+    return _mm_fnmadd_ps( V1, V2, V3 );
 }
 
 
@@ -108,9 +84,9 @@ inline XMVECTOR XM_CALLCONV XMVector2Transform
 )
 {
     XMVECTOR vResult = _mm_permute_ps(V,_MM_SHUFFLE(1,1,1,1)); // Y
-    vResult = _mm_macc_ps( vResult, M.r[1], M.r[3] );
+    vResult = _mm_fmadd_ps( vResult, M.r[1], M.r[3] );
     XMVECTOR vTemp = _mm_permute_ps(V,_MM_SHUFFLE(0,0,0,0)); // X
-    vResult = _mm_macc_ps( vTemp, M.r[0], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[0], vResult );
     return vResult;
 }
 
@@ -121,9 +97,9 @@ inline XMVECTOR XM_CALLCONV XMVector2TransformCoord
 )
 {
     XMVECTOR vResult = _mm_permute_ps(V,_MM_SHUFFLE(1,1,1,1)); // Y
-    vResult = _mm_macc_ps( vResult, M.r[1], M.r[3] );
+    vResult = _mm_fmadd_ps( vResult, M.r[1], M.r[3] );
     XMVECTOR vTemp = _mm_permute_ps(V,_MM_SHUFFLE(0,0,0,0)); // X
-    vResult = _mm_macc_ps( vTemp, M.r[0], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[0], vResult );
     XMVECTOR W = _mm_permute_ps(vResult,_MM_SHUFFLE(3,3,3,3));
     vResult = _mm_div_ps( vResult, W );
     return vResult;
@@ -138,7 +114,7 @@ inline XMVECTOR XM_CALLCONV XMVector2TransformNormal
     XMVECTOR vResult = _mm_permute_ps(V,_MM_SHUFFLE(1,1,1,1)); // Y
     vResult = _mm_mul_ps( vResult, M.r[1] );
     XMVECTOR vTemp = _mm_permute_ps(V,_MM_SHUFFLE(0,0,0,0)); // X
-    vResult = _mm_macc_ps( vTemp, M.r[0], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[0], vResult );
     return vResult;
 }
 
@@ -154,11 +130,11 @@ inline XMVECTOR XM_CALLCONV XMVector3Transform
 )
 {
     XMVECTOR vResult = _mm_permute_ps(V,_MM_SHUFFLE(2,2,2,2)); // Z
-    vResult = _mm_macc_ps( vResult, M.r[2], M.r[3] );
+    vResult = _mm_fmadd_ps( vResult, M.r[2], M.r[3] );
     XMVECTOR vTemp = _mm_permute_ps(V,_MM_SHUFFLE(1,1,1,1)); // Y
-    vResult = _mm_macc_ps( vTemp, M.r[1], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[1], vResult );
     vTemp = _mm_permute_ps(V,_MM_SHUFFLE(0,0,0,0)); // X
-    vResult = _mm_macc_ps( vTemp, M.r[0], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[0], vResult );
     return vResult;
 }
 
@@ -169,11 +145,11 @@ inline XMVECTOR XM_CALLCONV XMVector3TransformCoord
 )
 {
     XMVECTOR vResult = _mm_permute_ps(V,_MM_SHUFFLE(2,2,2,2)); // Z
-    vResult = _mm_macc_ps( vResult, M.r[2], M.r[3] );
+    vResult = _mm_fmadd_ps( vResult, M.r[2], M.r[3] );
     XMVECTOR vTemp = _mm_permute_ps(V,_MM_SHUFFLE(1,1,1,1)); // Y
-    vResult = _mm_macc_ps( vTemp, M.r[1], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[1], vResult );
     vTemp = _mm_permute_ps(V,_MM_SHUFFLE(0,0,0,0)); // X
-    vResult = _mm_macc_ps( vTemp, M.r[0], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[0], vResult );
     XMVECTOR W = _mm_permute_ps(vResult,_MM_SHUFFLE(3,3,3,3));
     vResult = _mm_div_ps( vResult, W );
     return vResult;
@@ -188,9 +164,9 @@ inline XMVECTOR XM_CALLCONV XMVector3TransformNormal
     XMVECTOR vResult = _mm_permute_ps(V,_MM_SHUFFLE(2,2,2,2)); // Z
     vResult = _mm_mul_ps( vResult, M.r[2] );
     XMVECTOR vTemp = _mm_permute_ps(V,_MM_SHUFFLE(1,1,1,1)); // Y
-    vResult = _mm_macc_ps( vTemp, M.r[1], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[1], vResult );
     vTemp = _mm_permute_ps(V,_MM_SHUFFLE(0,0,0,0)); // X
-    vResult = _mm_macc_ps( vTemp, M.r[0], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[0], vResult );
     return vResult;
 }
 
@@ -216,12 +192,12 @@ inline XMVECTOR XM_CALLCONV XMVector3Project
     XMVECTOR Scale = XMVectorSet(HalfViewportWidth, -HalfViewportHeight, ViewportMaxZ - ViewportMinZ, 0.0f);
     XMVECTOR Offset = XMVectorSet(ViewportX + HalfViewportWidth, ViewportY + HalfViewportHeight, ViewportMinZ, 0.0f);
 
-    XMMATRIX Transform = FMA4::XMMatrixMultiply(World, View);
-    Transform = FMA4::XMMatrixMultiply(Transform, Projection);
+    XMMATRIX Transform = FMA3::XMMatrixMultiply(World, View);
+    Transform = FMA3::XMMatrixMultiply(Transform, Projection);
 
-    XMVECTOR Result = FMA4::XMVector3TransformCoord(V, Transform);
+    XMVECTOR Result = FMA3::XMVector3TransformCoord(V, Transform);
 
-    Result = FMA4::XMVectorMultiplyAdd(Result, Scale, Offset);
+    Result = FMA3::XMVectorMultiplyAdd(Result, Scale, Offset);
 
     return Result;
 }
@@ -246,15 +222,15 @@ inline XMVECTOR XM_CALLCONV XMVector3Unproject
     Scale = XMVectorReciprocal(Scale);
 
     XMVECTOR Offset = XMVectorSet(-ViewportX, -ViewportY, -ViewportMinZ, 0.0f);
-    Offset = FMA4::XMVectorMultiplyAdd(Scale, Offset, D.v);
+    Offset = FMA3::XMVectorMultiplyAdd(Scale, Offset, D.v);
 
-    XMMATRIX Transform = FMA4::XMMatrixMultiply(World, View);
-    Transform = FMA4::XMMatrixMultiply(Transform, Projection);
+    XMMATRIX Transform = FMA3::XMMatrixMultiply(World, View);
+    Transform = FMA3::XMMatrixMultiply(Transform, Projection);
     Transform = XMMatrixInverse(nullptr, Transform);
 
-    XMVECTOR Result = FMA4::XMVectorMultiplyAdd(V, Scale, Offset);
+    XMVECTOR Result = FMA3::XMVectorMultiplyAdd(V, Scale, Offset);
 
-    return FMA4::XMVector3TransformCoord(Result, Transform);
+    return FMA3::XMVector3TransformCoord(Result, Transform);
 }
 
 
@@ -271,11 +247,11 @@ inline XMVECTOR XM_CALLCONV XMVector4Transform
     XMVECTOR vResult = _mm_permute_ps(V,_MM_SHUFFLE(3,3,3,3)); // W
     vResult = _mm_mul_ps( vResult, M.r[3] );
     XMVECTOR vTemp = _mm_permute_ps(V,_MM_SHUFFLE(2,2,2,2)); // Z
-    vResult = _mm_macc_ps( vTemp, M.r[2], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[2], vResult );
     vTemp = _mm_permute_ps(V,_MM_SHUFFLE(1,1,1,1)); // Y
-    vResult = _mm_macc_ps( vTemp, M.r[1], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[1], vResult );
     vTemp = _mm_permute_ps(V,_MM_SHUFFLE(0,0,0,0)); // X
-    vResult = _mm_macc_ps( vTemp, M.r[0], vResult );
+    vResult = _mm_fmadd_ps( vTemp, M.r[0], vResult );
     return vResult;
 }
 
@@ -300,9 +276,9 @@ inline XMMATRIX XM_CALLCONV XMMatrixMultiply
     vW = _mm_permute_ps(vW,_MM_SHUFFLE(3,3,3,3));
     // Perform the operation on the first row
     vX = _mm_mul_ps(vX,M2.r[0]);
-    vX = _mm_macc_ps(vY,M2.r[1],vX);
-    vX = _mm_macc_ps(vZ,M2.r[2],vX);
-    vX = _mm_macc_ps(vW,M2.r[3],vX);
+    vX = _mm_fmadd_ps(vY,M2.r[1],vX);
+    vX = _mm_fmadd_ps(vZ,M2.r[2],vX);
+    vX = _mm_fmadd_ps(vW,M2.r[3],vX);
     mResult.r[0] = vX;
     // Repeat for the other 3 rows
     vW = M1.r[1];
@@ -311,9 +287,9 @@ inline XMMATRIX XM_CALLCONV XMMatrixMultiply
     vZ = _mm_permute_ps(vW,_MM_SHUFFLE(2,2,2,2));
     vW = _mm_permute_ps(vW,_MM_SHUFFLE(3,3,3,3));
     vX = _mm_mul_ps(vX,M2.r[0]);
-    vX = _mm_macc_ps(vY,M2.r[1],vX);
-    vX = _mm_macc_ps(vZ,M2.r[2],vX);
-    vX = _mm_macc_ps(vW,M2.r[3],vX);
+    vX = _mm_fmadd_ps(vY,M2.r[1],vX);
+    vX = _mm_fmadd_ps(vZ,M2.r[2],vX);
+    vX = _mm_fmadd_ps(vW,M2.r[3],vX);
     mResult.r[1] = vX;
     vW = M1.r[2];
     vX = _mm_permute_ps(vW,_MM_SHUFFLE(0,0,0,0));
@@ -321,9 +297,9 @@ inline XMMATRIX XM_CALLCONV XMMatrixMultiply
     vZ = _mm_permute_ps(vW,_MM_SHUFFLE(2,2,2,2));
     vW = _mm_permute_ps(vW,_MM_SHUFFLE(3,3,3,3));
     vX = _mm_mul_ps(vX,M2.r[0]);
-    vX = _mm_macc_ps(vY,M2.r[1],vX);
-    vX = _mm_macc_ps(vZ,M2.r[2],vX);
-    vX = _mm_macc_ps(vW,M2.r[3],vX);
+    vX = _mm_fmadd_ps(vY,M2.r[1],vX);
+    vX = _mm_fmadd_ps(vZ,M2.r[2],vX);
+    vX = _mm_fmadd_ps(vW,M2.r[3],vX);
     mResult.r[2] = vX;
     vW = M1.r[3];
     vX = _mm_permute_ps(vW,_MM_SHUFFLE(0,0,0,0));
@@ -331,9 +307,9 @@ inline XMMATRIX XM_CALLCONV XMMatrixMultiply
     vZ = _mm_permute_ps(vW,_MM_SHUFFLE(2,2,2,2));
     vW = _mm_permute_ps(vW,_MM_SHUFFLE(3,3,3,3));
     vX = _mm_mul_ps(vX,M2.r[0]);
-    vX = _mm_macc_ps(vY,M2.r[1],vX);
-    vX = _mm_macc_ps(vZ,M2.r[2],vX);
-    vX = _mm_macc_ps(vW,M2.r[3],vX);
+    vX = _mm_fmadd_ps(vY,M2.r[1],vX);
+    vX = _mm_fmadd_ps(vZ,M2.r[2],vX);
+    vX = _mm_fmadd_ps(vW,M2.r[3],vX);
     mResult.r[3] = vX;
     return mResult;
 }
@@ -353,9 +329,9 @@ inline XMMATRIX XM_CALLCONV XMMatrixMultiplyTranspose
     vW = _mm_permute_ps(vW,_MM_SHUFFLE(3,3,3,3));
     // Perform the operation on the first row
     vX = _mm_mul_ps(vX,M2.r[0]);
-    vX = _mm_macc_ps(vY,M2.r[1],vX);
-    vX = _mm_macc_ps(vZ,M2.r[2],vX);
-    vX = _mm_macc_ps(vW,M2.r[3],vX);
+    vX = _mm_fmadd_ps(vY,M2.r[1],vX);
+    vX = _mm_fmadd_ps(vZ,M2.r[2],vX);
+    vX = _mm_fmadd_ps(vW,M2.r[3],vX);
     __m128 r0 = vX;
     // Repeat for the other 3 rows
     vW = M1.r[1];
@@ -364,9 +340,9 @@ inline XMMATRIX XM_CALLCONV XMMatrixMultiplyTranspose
     vZ = _mm_permute_ps(vW,_MM_SHUFFLE(2,2,2,2));
     vW = _mm_permute_ps(vW,_MM_SHUFFLE(3,3,3,3));
     vX = _mm_mul_ps(vX,M2.r[0]);
-    vX = _mm_macc_ps(vY,M2.r[1],vX);
-    vX = _mm_macc_ps(vZ,M2.r[2],vX);
-    vX = _mm_macc_ps(vW,M2.r[3],vX);
+    vX = _mm_fmadd_ps(vY,M2.r[1],vX);
+    vX = _mm_fmadd_ps(vZ,M2.r[2],vX);
+    vX = _mm_fmadd_ps(vW,M2.r[3],vX);
     __m128 r1 = vX;
     vW = M1.r[2];
     vX = _mm_permute_ps(vW,_MM_SHUFFLE(0,0,0,0));
@@ -374,9 +350,9 @@ inline XMMATRIX XM_CALLCONV XMMatrixMultiplyTranspose
     vZ = _mm_permute_ps(vW,_MM_SHUFFLE(2,2,2,2));
     vW = _mm_permute_ps(vW,_MM_SHUFFLE(3,3,3,3));
     vX = _mm_mul_ps(vX,M2.r[0]);
-    vX = _mm_macc_ps(vY,M2.r[1],vX);
-    vX = _mm_macc_ps(vZ,M2.r[2],vX);
-    vX = _mm_macc_ps(vW,M2.r[3],vX);
+    vX = _mm_fmadd_ps(vY,M2.r[1],vX);
+    vX = _mm_fmadd_ps(vZ,M2.r[2],vX);
+    vX = _mm_fmadd_ps(vW,M2.r[3],vX);
     __m128 r2 = vX;
     vW = M1.r[3];
     vX = _mm_permute_ps(vW,_MM_SHUFFLE(0,0,0,0));
@@ -384,9 +360,9 @@ inline XMMATRIX XM_CALLCONV XMMatrixMultiplyTranspose
     vZ = _mm_permute_ps(vW,_MM_SHUFFLE(2,2,2,2));
     vW = _mm_permute_ps(vW,_MM_SHUFFLE(3,3,3,3));
     vX = _mm_mul_ps(vX,M2.r[0]);
-    vX = _mm_macc_ps(vY,M2.r[1],vX);
-    vX = _mm_macc_ps(vZ,M2.r[2],vX);
-    vX = _mm_macc_ps(vW,M2.r[3],vX);
+    vX = _mm_fmadd_ps(vY,M2.r[1],vX);
+    vX = _mm_fmadd_ps(vZ,M2.r[2],vX);
+    vX = _mm_fmadd_ps(vW,M2.r[3],vX);
     __m128 r3 = vX;
 
     // x.x,x.y,y.x,y.y
@@ -410,6 +386,6 @@ inline XMMATRIX XM_CALLCONV XMMatrixMultiplyTranspose
     return mResult;
 }
 
-} // namespace FMA4
+} // namespace FMA3
 
 } // namespace DirectX;
